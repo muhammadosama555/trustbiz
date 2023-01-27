@@ -3,15 +3,43 @@ const ErrorHandler = require('../utils/errorHandler.js')
 const catchAsyncErrors= require('../middlewares/catchAsyncErrors')
 const User = require("../model/User.js")
 const { default: mongoose } = require("mongoose")
+const cloudinary= require("cloudinary").v2
+
+// Configuration 
+cloudinary.config({
+    cloud_name: "dkrttx4u2",
+    api_key: "356652623198427",
+    api_secret: "d3ivayyXIq8gWQwJ638gUXF0yZw"
+  });
+
+
 
 //Posting new business       => /api/business/new
 exports.newBusiness = catchAsyncErrors(async (req, res, next) => {
-    const business = await Business.create(req.body)
+     
+    const file= req.files.photo
+    cloudinary.uploader.upload(file.tempFilePath, (err,result)=>{
+         console.log(result);
+         const business = new Business({
+            title:req.body.title,
+            desc:req.body.desc,
+            categories:req.body.categories,
+            address:req.body.address,
+            city:req.body.city,
+            country:req.body.country,
+            img:[{url:result.url}],
+            owner:req.body.owner,
+
+         })
+         business.save()
     
-    res.status(200).json({
-        success: true,
-        business
+         res.status(200).json({
+             success: true,
+             business
+         })
     })
+
+  
 }) 
 
 

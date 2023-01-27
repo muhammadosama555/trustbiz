@@ -5,6 +5,7 @@ const mongoose=require("mongoose")
 const authRoute=require("./routes/auth.js")
 const businessRoute=require("./routes/business.js")
 const cookieParser= require('cookie-parser')
+const fileUpload= require('express-fileupload')
 
 const errorMiddleware = require('./middlewares/errors.js')
 
@@ -17,6 +18,10 @@ mongoose.connect(process.env.MONGO_URL)
 })
 
 const app=express()
+app.use(fileUpload({
+    useTempFiles:true
+}))
+
 app.use(express.json())
 app.use(cookieParser())
 
