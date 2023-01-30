@@ -2,6 +2,7 @@ const Business = require("../model/Business.js")
 const ErrorHandler = require('../utils/errorHandler.js')
 const catchAsyncErrors= require('../middlewares/catchAsyncErrors')
 const User = require("../model/User.js")
+const APIFeatures= require("../utils/apiFeatures.js")
 const { default: mongoose } = require("mongoose")
 const cloudinary= require("cloudinary").v2
 
@@ -46,10 +47,17 @@ exports.newBusiness = catchAsyncErrors(async (req, res, next) => {
 
 //Get All business        api/business
 exports.getAllBusiness = catchAsyncErrors( async (req, res, next) => {
+    
+    const resPerPage=4
 
-    const business = await Business.find()
+    const apiFeatures= new APIFeatures(Business.find(),req.query)
+                       .search()
+                       .pagination(resPerPage)
+
+    const business = await apiFeatures.query
     res.status(200).json({
         success: true,
+        count:business.length,
         business
     })
 })
