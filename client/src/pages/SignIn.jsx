@@ -1,9 +1,45 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from 'react'
+import { useAlert } from 'react-alert'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import Loader from '../components/Loader'
+import { login } from '../redux/apiCalls/userApiCalls'
+
 
 function SignIn() {
+
+  const [username,setUsername] = useState("")
+  const [password,setPassword] = useState("")
+  const dispatch = useDispatch();
+  const alert = useAlert()
+  const Navigate = useNavigate()
+  const {loading,error,currentUser} = useSelector(state=>state.userSlice)
+  const location = useLocation()
+  console.log(location);
+  const redirect = location.search ? location.search.split('=')[1] : '/'
+
+  useEffect(()=>{
+      if (error) {
+        console.log(error);
+          alert.error("password or email is incorrect")
+      }
+
+    if (currentUser) {
+       Navigate("/")
+    }
+  },[error,Navigate,alert,currentUser])
+
+  const submitHandler = (e) => {
+  e.preventDefault()
+  login(dispatch,{username,password})
+   }
+
+
   return (
-    <div className="sign-in h-[900px] ">
+    <>
+    {loading ? <Loader/> : (
+      <>
+      <div className="sign-in h-[900px] ">
       <div
         className="relative bg-center bg-cover h-full"
         Style="background-image: url('assets/signIn.jpg');"
@@ -48,14 +84,14 @@ function SignIn() {
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2 ">
                   <label className="text-xl pl-1" for="email">
-                    Email ID
+                    User Name
                   </label>
                   <input
                     className="w-full px-4 py-2 text-black placeholder:text-gray-300 rounded-md border outline-none bg-gray-50"
                     type="text"
-                    id="email"
-                    name="email"
-                    placeholder="Abc"
+                    id="username"
+                    defaultValue=""
+                    onChange={(e)=>setUsername(e.target.value)}
                   />
                 </div>
                 <div className="flex flex-col gap-2 ">
@@ -66,8 +102,8 @@ function SignIn() {
                     className="w-full px-4 py-2 text-black placeholder:text-gray-300 rounded-md border outline-none bg-gray-50"
                     type="password"
                     id="password"
-                    name="password"
-                    placeholder="Password"
+                    defaultValue=""
+                    onChange={(e)=>setPassword(e.target.value)}
                   />
                 </div>
               </div>
@@ -77,13 +113,16 @@ function SignIn() {
             </div>
           </div>
           <div className="flex justify-end pt-3 pb-10">
-            <button className="text-base text-center  font-normal nav-link btn text-black bg-opacity-100 z-20 absolute px-6 py-2 rounded-lg  hover:drop-shadow-sm">
+            <button className="text-base text-center  font-normal nav-link btn text-black bg-opacity-100 z-20 absolute px-6 py-2 rounded-lg  hover:drop-shadow-sm" onClick={submitHandler}>
               Sign in
             </button>
           </div>
         </div>
       </div>
     </div>
+      </>
+    ) }
+    </>
   );
 }
 

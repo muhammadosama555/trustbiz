@@ -1,5 +1,4 @@
 import React from 'react'
-import Rating from './Rating'
 
 function ProfileBusiness() {
   return (
@@ -13,7 +12,7 @@ function ProfileBusiness() {
         <h1 className="title text-3xl pt-6 font-medium">Title</h1>
         <h3 className="category pt-3">Category</h3>
         <h3 className="address pt-1">Address</h3>
-        <Rating/>
+      {/* ratings */}
       </div>
       <button className="active px-5 py-1 text-xs text-lime-600 border border-lime-500 absolute bottom-5 rounded-full bg-lime-200">
         Active

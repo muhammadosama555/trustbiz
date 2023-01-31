@@ -11,10 +11,10 @@ import {
 
 //  get all Businesses
 
-  export const getBusinesses = async (dispatch) => {
+  export const getBusinesses = async (dispatch,currentPage,keyword="") => {
     dispatch(getBusinessStart());
     try {
-      const res = await axios.get("/api/business/all");
+      const res = await axios.get(`/api/business/all?page=${currentPage}&keyword=${keyword}`);
       dispatch(getBusinessSuccess(res.data));
     } catch (error) {
       dispatch(getBusinessFailure());

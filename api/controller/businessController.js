@@ -49,6 +49,7 @@ exports.newBusiness = catchAsyncErrors(async (req, res, next) => {
 exports.getAllBusiness = catchAsyncErrors( async (req, res, next) => {
     
     const resPerPage=4
+    const businessCount=await Business.countDocuments();
 
     const apiFeatures= new APIFeatures(Business.find(),req.query)
                        .search()
@@ -57,8 +58,10 @@ exports.getAllBusiness = catchAsyncErrors( async (req, res, next) => {
     const business = await apiFeatures.query
     res.status(200).json({
         success: true,
+        businessCount,
         count:business.length,
-        business
+        business,
+        
     })
 })
 

@@ -42,3 +42,55 @@ body {
   animation: lds-dual-ring 1.2s linear infinite;
 }
 
+/* Ratings */
+
+.rating-outer {
+  display: inline-block;
+  position: relative;
+  font-family: FontAwesome;
+  color: #fdcc0d;
+  max-width: fit-content;
+}
+
+.rating-outer::before {
+  content: '\f006 \f006 \f006 \f006 \f006';
+}
+
+.rating-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0;
+}
+
+.rating-inner::before {
+  content: '\f005 \f005 \f005 \f005 \f005';
+  color: #f8ce0b;
+}
+
+/* Pagination */
+
+
+
+.page-item.active .page-link {
+  background-color: #fa9c23;
+  border-color: #fa9c23;
+  color: #fff;
+}
+
+.page-link {
+  padding: 2px 5px;
+  color: #fa9c23;
+}
+
+.page-link:hover {
+  color: #fa9c23;
+}
+
+.pagination{
+  display: flex;
+gap: 10px;
+}
+

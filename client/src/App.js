@@ -13,9 +13,7 @@ import SignUp from './pages/SignUp';
 
 const App = () => {
 
-  // it alternative to the useContext hooks in react / consumer from context API
   
-
   return (
    <>
    <Navbar/>

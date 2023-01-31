@@ -12,7 +12,7 @@ exports.registerUser=  async(req,res)=>{
     })
     try {
       const savedUser= await newUser.save();
-      sendToken(user,200,res  )
+      sendToken(savedUser,200,res)
     } catch (err) {
       console.log(err);
       res.status(500).json(err)
