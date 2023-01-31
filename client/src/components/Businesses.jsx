@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "./Loader";
 import { useAlert } from "react-alert";
 import Pagination from 'react-js-pagination'
+import { useParams } from "react-router-dom";
 
 function Businesses() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,19 +17,23 @@ function Businesses() {
 
   const dispatch = useDispatch();
   const alert = useAlert();
+  const {keyword} = useParams();
 
   useEffect(() => {
-    getBusinesses(dispatch,currentPage);
+    getBusinesses(dispatch,currentPage,keyword);
     if (error) {
       alert.error("My Error");
     }
-  }, [dispatch, error, alert, currentPage]);
+  }, [dispatch, error, alert, currentPage,keyword]);
 
   const setCurrentPageNo = (pageNumber) => {
     setCurrentPage(pageNumber)
   }
 
   let count = businessData.businessCount;
+  if (keyword) {
+    count = businessData.filteredProductsCount
+  }
 
   return (
     <>
