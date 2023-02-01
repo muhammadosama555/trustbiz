@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 function Footer() {
   return (
     <footer className="flex flex-col justify-center h-[480px] text-white"
-    Style="background: linear-gradient(262.22deg, #779DCA -4.78%, #192A3D 98.21%);">
+    style={{background: `linear-gradient(262.22deg, #779DCA -4.78%, #192A3D 98.21%)`}}>
 
     <div className="footerContent flex items-center justify-between mx-56 h-64 border-t border-b border-slate-400 ">
         <div className="logo flex items-center gap-2">

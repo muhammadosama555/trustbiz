@@ -19,7 +19,7 @@ function Navbar() {
         <nav className="flex items-center justify-between">
                 <Link to="/" className="logo flex items-center">
                 <img className="h-12 w-12" src="../assets/main-logo.png" alt=""/>
-                <h1 classNameName="text-2xl font-normal"> <span className="font-bold">Trust</span>Biz</h1>
+                <h1 className="text-2xl font-normal"> <span className="font-bold">Trust</span>Biz</h1>
                 </Link>
             <div className="nav-links">
                 <ul className="flex space-x-5 items-center">

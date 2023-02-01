@@ -20,7 +20,7 @@ function BusinessDetails() {
     if (error) {
       alert.error("Error")
   }
-  }, [dispatch,error,id,alert]);
+  }, [dispatch,error,id]);
   console.log(businessesDetails);
 
   return (
