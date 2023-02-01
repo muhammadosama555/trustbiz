@@ -53,6 +53,7 @@ exports.getAllBusiness = catchAsyncErrors( async (req, res, next) => {
 
     const apiFeatures= new APIFeatures(Business.find(),req.query)
                        .search()
+                       .filter()
                        .pagination(resPerPage)
 
     const business = await apiFeatures.query

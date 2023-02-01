@@ -17,6 +17,16 @@ class APIFeatures {
         this.query= this.query.find({...keyword})
         return this
     }
+    filter(){
+        const queryCopy ={ ...this.queryStr};
+
+        //Removing fields from the query
+        const removeFields = ['keyword','limit','page']
+        removeFields.forEach(el => delete queryCopy[el])
+
+        this.query= this.query.find(queryCopy)
+        return this
+    }
 
     pagination(resPerPage){
 
