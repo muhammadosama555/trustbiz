@@ -7,6 +7,7 @@ export const businessSlice = createSlice({
     businessDetails: [],
     loading: false,
     error: false,
+    isUpdated: false
   },
   reducers: {
     //GET ALL
@@ -34,6 +35,23 @@ export const businessSlice = createSlice({
       state.loading = false;
       state.error = true;
     },
+    postbusinessDetailsStart: (state) => {
+      state.loading = true;
+      state.error = false;
+      state.isUpdated = false;
+    },
+    postbusinessDetailsSuccess: (state, action) => {
+      state.loading = false;
+      state.isUpdated = true;
+    },
+    postbusinessDetailsFailure: (state) => {
+      state.loading = false;
+      state.error = true;
+      state.isUpdated = false;
+    },
+    updateReset: (state) => {
+      state.isUpdated = false
+    },
   }
 });
 
@@ -44,6 +62,10 @@ export const {
  getbusinessDetailsStart,
  getbusinessDetailsSuccess,
  getbusinessDetailsFailure,
+ postbusinessDetailsStart,
+ postbusinessDetailsSuccess,
+ postbusinessDetailsFailure,
+ updateReset,
 } = businessSlice.actions;
 
 export default businessSlice.reducer;

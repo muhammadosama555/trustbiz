@@ -18,18 +18,40 @@ cloudinary.config({
 //Posting new business       => /api/business/new
 exports.newBusiness = catchAsyncErrors(async (req, res, next) => {
      
-    const file= req.files.photo
-    cloudinary.uploader.upload(file.tempFilePath, (err,result)=>{
-         console.log(result);
-         const business = new Business({
+    let file= false
+
+    req.files.photo ? file = req.files.photo : file = false
+
+    if(file){
+        cloudinary.uploader.upload(file.tempFilePath, (err,result)=>{
+            console.log(result);
+            const business = new Business({
+               title:req.body.title,
+               desc:req.body.desc,
+               categories:req.body.categories,
+               address:req.body.address,
+               city:req.body.city,
+               country:req.body.country,
+               img:[{url:result.url}],
+               owner:req.user._id,
+   
+            })
+            business.save()
+       
+            res.status(200).json({
+                success: true,
+                business
+            })
+       })
+    }else{
+        const business = new Business({
             title:req.body.title,
             desc:req.body.desc,
             categories:req.body.categories,
             address:req.body.address,
             city:req.body.city,
             country:req.body.country,
-            img:[{url:result.url}],
-            owner:req.body.owner,
+            owner:req.user._id,
 
          })
          business.save()
@@ -38,7 +60,8 @@ exports.newBusiness = catchAsyncErrors(async (req, res, next) => {
              success: true,
              business
          })
-    })
+    }
+    
 
   
 }) 
@@ -48,19 +71,25 @@ exports.newBusiness = catchAsyncErrors(async (req, res, next) => {
 //Get All business        api/business
 exports.getAllBusiness = catchAsyncErrors( async (req, res, next) => {
     
-    const resPerPage=4
+    let resPerPage=4
+    req.query.limit ? resPerPage=req.query.limit : resPerPage=4
+
     const businessCount=await Business.countDocuments();
 
     const apiFeatures= new APIFeatures(Business.find(),req.query)
                        .search()
                        .filter()
-                       .pagination(resPerPage)
 
-    const business = await apiFeatures.query
+    let business= await apiFeatures.query.clone();
+    let filteredBusinessCount = business.length
+    apiFeatures.pagination(resPerPage)
+    business= await apiFeatures.query;
+
     res.status(200).json({
         success: true,
         businessCount,
-        count:business.length,
+        filteredBusinessCount,
+        count:resPerPage,
         business,
         
     })

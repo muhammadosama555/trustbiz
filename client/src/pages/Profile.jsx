@@ -1,8 +1,14 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import ProfileBusiness from "../components/ProfileBusiness";
 
 
 function Profile() {
+
+  const {isFetching,currentUser} = useSelector(state=>state.userSlice)
+  const user = currentUser.user
+  console.log(user.username);
+
   return (
     <div className="profile mt-10">
       <div className="top-secton flex items-center gap-10 mx-32 relative mb-10">
@@ -20,20 +26,20 @@ function Profile() {
               type="text"
               id="title"
               name="title"
-              placeholder="Abc"
+              defaultValue={user.username}
             />
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-xl pl-1" for="title">
               Profile Picture
             </label>
-            <input
-              className="w-full px-4 py-2 placeholder:text-gray-300 rounded-md border border-gray-200 bg-gray-50"
-              type="picture"
-              id="picture"
-              name="picture"
-              placeholder="Abc"
-            />
+              <input
+                className="absolute w-full px-4 py-2 placeholder:text-gray-300 rounded-md border border-gray-200 bg-gray-50"
+                type="file"
+                id="img"
+                name="img"
+                defaultValue={user.img}
+              />
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-xl pl-1" for="title">
@@ -41,10 +47,10 @@ function Profile() {
             </label>
             <input
               className="w-full px-4 py-2 placeholder:text-gray-300 rounded-md border border-gray-200 bg-gray-50"
-              type="contact"
+              type="number"
               id="contact"
               name="contact"
-              placeholder="Abc"
+              defaultValue={user.phoneNo}
             />
           </div>
         </div>

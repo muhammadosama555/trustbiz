@@ -6,7 +6,7 @@ function Hero() {
   return (
     <div
       className="hero relative bg-cover bg-center h-[700px]"
-      Style="background-image: url('assets/Home-bg.jpg');"
+      style={{backgroundImage: `url("assets/Home-bg.jpg")`}}
     >
       <div className="absolute top-24 left-20">
         <h1 className="text-5xl font-normal">

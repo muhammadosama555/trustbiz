@@ -1,23 +1,26 @@
-import React from 'react'
-import {Link} from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
-function Business({business}) {
-
+function Business({ business }) {
   return (
-    <div
-    className="card hover:scale-105 ease-in-out duration-300 w-96 h-[385px] rounded-xl overflow-hidden shadow hover:shadow-lg">
-    <Link to = {`/businessdetails/${business._id}`}>
-        <img className="h-60 w-96 object-cover" src="assets/Card1.jpg" alt=""/>
-        <div className="card-content pl-5 py-5 space-y-1">
-            <h2 className="text-2xl font-semibold">{business.title}</h2>
-            <h4 className="text-xl font-medium">{business.categories}</h4>
-            <div className="rating-outer">
-    <div className="rating-inner" style={{width: `${(business.rating/5)*100}%`}}></div>
-    </div>
+    //<div className="card hover:scale-105 ease-in-out duration-300 w-56 h-[300px] border border-gray-100 rounded-xl p-2 shadow hover:shadow-lg">
+      <Link to={`/businessdetails/${business._id}`} className="relative card hover:scale-105 ease-in-out duration-300 w-56 h-[300px] border border-gray-100 rounded-xl p-2 shadow hover:shadow-lg">
+        <div className="w-full h-1/2 overflow-hidden rounded-lg">
+          <img className="object-cover" src={business.img[0]?.url} alt="" />
         </div>
-    </Link>
-</div>
-  )
+        <div className="card-content space-y-1 bottom-4 absolute">
+          <h2 className="text-xl font-semibold">{business.title}</h2>
+          <h4 className="text-lg font-medium">{business.categories}</h4>
+          <div className="rating-outer">
+            <div
+              className="rating-inner"
+              style={{ width: `${(business.rating / 5) * 100}%` }}
+            ></div>
+          </div>
+        </div>
+      </Link>
+    //</div>
+  );
 }
 
-export default Business
+export default Business;

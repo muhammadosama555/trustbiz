@@ -84,7 +84,7 @@ const userSlice = createSlice({
           state.error = false;
           state.isUpdated = action.payload.success
         },
-        updatePasswordReset: (state,action) => {
+        updatePasswordReset: (state) => {
           state.isUpdated = false
         },
         updatePasswordFailure: (state) => {

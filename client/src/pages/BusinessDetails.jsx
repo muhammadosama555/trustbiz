@@ -5,6 +5,7 @@ import Loader from "../components/Loader";
 import MetaData from "../components/MetaData";
 import Reviews from "../components/Reviews";
 import { getBusinessesDetails } from "../redux/apiCalls/businessApiCalls";
+import { useAlert } from "react-alert";
 
 function BusinessDetails() {
   const { businessDetails, loading, error } = useSelector(
@@ -31,7 +32,7 @@ function BusinessDetails() {
        <div className="hero mx-10 overflow-hidden">
         <div
           className="hero relative rounded-2xl bg-cover bg-center h-[750px]"
-          Style="background-image: url('../assets/ferrari.jpg');"
+          style={{backgroundImage: `url(${businessesDetails.img[0]?.url})`}}
         >
           <div className="h-full w-full bg-black absolute z-10 rounded-2xl bg-opacity-40"></div>
           <div className="hero-content text-white z-20 absolute flex w-full items-end justify-between bottom-20 px-14">

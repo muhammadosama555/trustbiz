@@ -6,15 +6,22 @@ import {
     getbusinessDetailsStart,
     getbusinessDetailsSuccess,
     getbusinessDetailsFailure,
+    postbusinessDetailsStart,
+    postbusinessDetailsSuccess,
+    postbusinessDetailsFailure,
   } from "../reducers/businessReducers";
 
 
 //  get all Businesses
 
-  export const getBusinesses = async (dispatch,currentPage,keyword="") => {
+  export const getBusinesses = async (dispatch,currentPage,keyword="",rating=0,cat="",limit=4) => {
     dispatch(getBusinessStart());
     try {
-      const res = await axios.get(`/api/business/all?page=${currentPage}&keyword=${keyword}`);
+      let url = `/api/business/all?page=${currentPage}&keyword=${keyword}&rating[gte]=${rating}&limit=${limit}`
+      if (cat) {
+        url = `/api/business/all?page=${currentPage}&keyword=${keyword}&rating[gte]=${rating}&categories=${cat}&limit=${limit}`
+      }
+      const res = await axios.get(url);
       dispatch(getBusinessSuccess(res.data));
     } catch (error) {
       dispatch(getBusinessFailure());
@@ -30,6 +37,23 @@ import {
       dispatch(getbusinessDetailsSuccess(res.data));
     } catch (error) {
       dispatch(getbusinessDetailsFailure());
+    }
+  };
+
+//  post Businesses 
+
+  export const postBusinesses = async (dispatch,businessData) => {
+    dispatch(postbusinessDetailsStart());
+    try {
+      console.log(businessData);
+      const res = await axios.post("/api/business/new",businessData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      dispatch(postbusinessDetailsSuccess(res.data));
+    } catch (error) {
+      dispatch(postbusinessDetailsFailure());
     }
   };
 

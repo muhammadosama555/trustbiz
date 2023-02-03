@@ -81,9 +81,19 @@ exports.getAllUsers =catchAsyncErrors(async(req,res,next)=>{
      users
    })
 })
+
 //Get All user   => /api/auth
 exports.getSingleUser =catchAsyncErrors(async(req,res,next)=>{
    const user= await User.findById(req.params.id)
+   res.status(200).json({
+     success:true,
+     user
+   })
+})
+
+//Get All user   => /api/auth
+exports.getUserProfile =catchAsyncErrors(async(req,res,next)=>{
+   const user= await User.findById(req.user._id)
    res.status(200).json({
      success:true,
      user
