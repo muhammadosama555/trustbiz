@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAlert } from "react-alert";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getBusinesses, postBusinesses } from "../redux/apiCalls/businessApiCalls";
+import { postBusinesses } from "../redux/apiCalls/businessApiCalls";
 import { updateReset } from "../redux/reducers/businessReducers";
 
 function List() {

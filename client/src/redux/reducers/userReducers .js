@@ -49,7 +49,7 @@ const userSlice = createSlice({
           state.loading = false;
            state.error = true            
         },
-        logoutSuccess: (state,action) => {
+        logoutSuccess: (state) => {
           state.loading = false;
           state.error = false;
           state.currentUser = null;
@@ -68,7 +68,7 @@ const userSlice = createSlice({
           state.error = false;
           state.isUpdated = action.payload.success
         },
-        updateReset: (state,action) => {
+        updateReset: (state) => {
           state.loading = false
         },
         updateFailure: (state) => {
