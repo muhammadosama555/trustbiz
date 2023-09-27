@@ -21,7 +21,8 @@ router.post("/auth/register", registerUser)
  router.get("/auth/logout", logout )
 
 //delete user
- router.delete("/auth/:id", isAuthenticatedUser, authorizedroles('admin'),deleteUser)
+ router.delete("/auth/:id", deleteUser)
+//  router.delete("/auth/:id", isAuthenticatedUser, authorizedroles('admin'),deleteUser)
 
  //Get All users
  router.get("/auth/users",getAllUsers)
