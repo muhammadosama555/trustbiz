@@ -1,101 +1,93 @@
-const User = require("../model/User.js");
-const CryptoJs=require("crypto-js")
-const jwt=require("jsonwebtoken");
-const sendToken = require("../utils/jwtToken.js");
-const catchAsyncErrors = require("../middlewares/catchAsyncErrors.js");
-
-exports.registerUser=  async(req,res)=>{
-    const newUser= new User({
-      username:req.body.username,
-      email:req.body.email,
-      password:CryptoJs.AES.encrypt(req.body.password,process.env.PASS_SEC).toString()
-    })
-    try {
-      const savedUser= await newUser.save();
-      sendToken(savedUser,200,res)
-    } catch (err) {
-      console.log(err);
-      res.status(500).json(err)
-    }
-}
+const User = require('../model/User');
+const ErrorResponse= require("../utils/errorResponse")
+const asyncHandler=require('../middlewares/asyncHandler')
 
 
-exports.loginUser=  async (req,res)=>{
-    try {
-     const user = await User.findOne({username:req.body.username})
-     if(!user) return res.status(401).json("wrong credentials")
-
-     const hashedPass= await CryptoJs.AES.decrypt( 
-       user.password,
-       process.env.PASS_SEC
-     )
-     const savedpassword= await hashedPass.toString(CryptoJs.enc.Utf8)
-     if(savedpassword !==req.body.password) return res.status(401).json("wrong credentials")
-
-     const accessToken=jwt.sign({
-       id:user._id,
-       isAdmin:user.isAdmin
-     },process.env.JWT_SECRET,{expiresIn: process.env.JWT_EXPIRES_TIME})
-
-     const {password,...others}=user._doc;
-
-     sendToken(user,200,res)
-
-    } catch (err) {
-     res.status(500).json(err)
+//------------------------------------------------------ Register user  -----------------------------------------//
+//desc    Register user
+//route   /api/auth/register
+//access  public
+exports.registerUser = asyncHandler( async (req, res,next) => {
+    const { username, email, password, contact } = req.body;
+  
+      // create new user
+      const user = new User({
+        username,
+        email,
+        password,
+        contact
+      });
+      const token =user.getSignedJwtToken()
+  
+      // save user to database
+      await user.save();
+  
+      // return user data
+      res.json({
+          success:true,
+          user,
+          token:token
+  
+      });
+    
+  });
+  
+//------------------------------------------------------ Login user  -----------------------------------------//
+//desc    Login user
+//route   /api/auth/login
+//access  public
+exports.loginUser = async (req,res,next)=>{
+      const {email,password} =req.body
+  
+      //Validate email and password
+      if(!email || !password){
+          return next(new ErrorResponse('Please provide correct email and password',404))
+      }
+      const user=await User.findOne({email}).select('+password')
+      if(!user){
+          return next(new ErrorResponse('User not found',404))
+      }
+  
+      const isMatch=await user.matchPassword(password)
+      if(!isMatch){
+          return next(new ErrorResponse('Invalid password',401))
+      }
+  
+  
+     sendTokenResponse(user,200,res)
+  }
+  
+  //Get token from model,create cookie and send response 
+  const sendTokenResponse = async(user,statusCode,res)=>{
      
-    }
-}
+      //Create token
+      const token= await user.getSignedJwtToken()
+  
+      const options={
+          expires: new Date(Date.now()+ process.env.JWT_COOKIE*24*60*60*1000),
+          httpOnly: true
+      }
+      
+      res.status(statusCode).cookie('token',token,options).json({
+          success:true,
+          data:user,
+          token
+      })
+  }
 
-//Delete User  => /api/auth/delete/id
-exports.deleteUser = catchAsyncErrors(async (req,res,next)=>{
-    const user = await User.findByIdAndDelete(req.params.id)
-    res.status(200).json({
-      success:true,
-      message: 'user has been succesfully deleted'
-
-    })
-})
-
-
-//Logout User    => /api/logout
-
-exports.logout = catchAsyncErrors(async (req,res,next)=>{
-    res.cookie('token',null,{
-      expiresIn: new Date(Date.now()),
-      httpOnly: true
-
-    })
-
+//------------------------------------------------------ Logout user  -----------------------------------------//
+//desc    Logout user
+//route   /api/auth/logout
+//access  private
+exports.logout = asyncHandler(async (req, res, next) => {
+  
+    res.cookie("token", null, {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+    });
+  
     res.status(200).json({
       success: true,
-      message: 'logged out'
-    })
-})
-
-//Get All user   => /api/auth
-exports.getAllUsers =catchAsyncErrors(async(req,res,next)=>{
-   const users= await User.find()
-   res.status(200).json({
-     success:true,
-     users
-   })
-})
-
-//Get All user   => /api/auth
-exports.getSingleUser =catchAsyncErrors(async(req,res,next)=>{
-   const user= await User.findById(req.params.id)
-   res.status(200).json({
-     success:true,
-     user
-   })
-})
-
-//Get All user   => /api/auth
-exports.getUserProfile =catchAsyncErrors(async(req,res,next)=>{
-   const user= await User.findById(req.user._id)
-   res.status(200).json({
-     success:true,
-     user
-   })
-})
+      message: "User logged out",
+    });
+  });

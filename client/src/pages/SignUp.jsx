@@ -1,49 +1,35 @@
-import React, { useEffect, useState } from "react";
-import { useAlert } from "react-alert";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
-import { register } from "../redux/apiCalls/userApiCalls";
-import Loader from "../components/Loader";
+import React, { useRef } from "react";
+import { useCreateUser } from "../apiCalls/userApiCalls";
+import { Link } from "react-router-dom";
 
 function SignUp() {
-  const [username,setUsername] = useState("")
-  const [email,setEmail] = useState("")
-  const [password,setPassword] = useState("")
-  const dispatch = useDispatch();
-  const alert = useAlert();
-  const Navigate = useNavigate();
-  const { loading, error, currentUser } = useSelector(
-    (state) => state.userSlice
-  );
+  const usernameInputElement = useRef();
+  const emailInputElement = useRef();
+  const passwordInputElement = useRef();
+  const contactInputElement = useRef();
 
-  useEffect(() => {
-    
-    if (error) {
-      alert.error(error);
-    }
 
-    if (currentUser) {
-      Navigate("/");
-    }
-  }, [error, Navigate, alert,currentUser]);
+  const { mutate: createUserMutate, isLoading: isCreateUserLoading, isError: isCreateUserError, error: createUserError, } = useCreateUser();
 
-  const submitHandler = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const data = {
+      username: usernameInputElement.current?.value,
+      email: emailInputElement.current?.value,
+      password: passwordInputElement.current?.value,
+      contact: contactInputElement.current?.value,
+    };
 
-    register(dispatch, { username, email, password });
 
-    console.log(currentUser)
-    if (currentUser) {
-      Navigate("/");
-    }
+    createUserMutate(data);
+
   };
+
 
   return (
     <>
-      {loading ? (
-        <Loader />
-      ) : (
-        <>
+  
+        
           <div className="sign-in h-[900px] ">
             <div
               className="relative bg-center bg-cover h-full"
@@ -105,8 +91,9 @@ function SignUp() {
                           className="w-full px-4 py-2 text-black placeholder:text-gray-300 rounded-md border outline-none bg-gray-50"
                           type="text"
                           id="username"
-                          defaultValue = {username}
-                          onChange = {(e)=>setUsername(e.target.value)}
+                          name='username'
+                          placeholder='micheal'
+                          ref={usernameInputElement}
                         />
                       </div>
                       <div className="flex flex-col gap-2 ">
@@ -117,8 +104,9 @@ function SignUp() {
                           className="w-full px-4 py-2 text-black placeholder:text-gray-300 rounded-md border outline-none bg-gray-50"
                           type="text"
                           id="email"
-                          defaultValue = {email}
-                          onChange = {(e)=>setEmail(e.target.value)}
+                          name='email'
+                          placeholder='micheal@gmail.com'
+                          ref={emailInputElement}
                         />
                       </div>
                       <div className="flex flex-col gap-2 ">
@@ -129,8 +117,22 @@ function SignUp() {
                           className="w-full px-4 py-2 text-black placeholder:text-gray-300 rounded-md border outline-none bg-gray-50"
                           type="password"
                           id="password"
-                          defaultValue = {password}
-                          onChange = {(e)=>setPassword(e.target.value)}
+                          name='password'
+                          placeholder='password'
+                          ref={passwordInputElement}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2 ">
+                        <label className="text-xl pl-1" for="password">
+                          Contact
+                        </label>
+                        <input
+                          className="w-full px-4 py-2 text-black placeholder:text-gray-300 rounded-md border outline-none bg-gray-50"
+                          type="text"
+                          id="contact"
+                          name='contact'
+                          placeholder='053-2323-111'
+                          ref={contactInputElement}
                         />
                       </div>
                     </div>
@@ -140,16 +142,14 @@ function SignUp() {
                   </div>
                 </div>
                 <div className="flex justify-end pt-3 pb-10">
-                  <button className="text-base text-center  font-normal nav-link btn text-black bg-opacity-100 z-20 absolute px-6 py-2 rounded-lg  hover:drop-shadow-sm" onClick={submitHandler}>
-                    Sign up
+                  <button className="text-base text-center  font-normal nav-link btn text-black bg-opacity-100 z-20 absolute px-6 py-2 rounded-lg  hover:drop-shadow-sm" onClick={handleSubmit}>
+                    {isCreateUserLoading ? "Signing up" : "Sign up"}
                   </button>
                 </div>
               </div>
             </div>
           </div>
         </>
-      )}
-    </>
   );
 }
 

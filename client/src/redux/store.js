@@ -11,8 +11,10 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import businessReducers from "./reducers/businessReducers";
-import userReducers from "./reducers/userReducers ";
+import userReducers from "./reducers/userReducers";
+
+
+
 
 const persistConfig = {
   key: "root",
@@ -21,7 +23,6 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({ 
-  businessSlice: businessReducers,
   userSlice: userReducers, 
  });
 

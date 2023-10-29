@@ -24,9 +24,7 @@ function Hero() {
           consectetur adipisicing elit. Sint voluptatem, dolorum doloribus
           impedit adipisci natus?
         </p>
-        <button>
-          Register now
-        </button>
+       
       </div>
     </div>
   );

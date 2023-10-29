@@ -1,53 +1,50 @@
 import "./businessList.css";
 import { DataGrid } from "@material-ui/data-grid";
 import { DeleteOutline } from "@material-ui/icons";
+import Loader from '../../components/Loader'
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { DeleteBusiness, getBusinesses } from "../../redux/apiCalls/businessApiCalls";
+import { useDeleteBusiness, useGetBusinesses } from "../../apiCalls/businessApiCalls";
 
 export default function BusinessList() {
+  const {isLoading:isBusinessesLoading, data:businesses, isError:isBusinessesError, error:businessesError} = useGetBusinesses()
+  const {mutate:deleteBusinessMutate, isLoading:isDeleteBusinessLoading, isError:isDeleteBusinessError, error:deleteBusinessError} = useDeleteBusiness();
 
-  const {businessData} = useSelector(
-    (state) => state.businessSlice
-  );
+  if (isBusinessesLoading) {
+    return <Loader/>
+  }
+  
+  if (isBusinessesError) {
+    return <h2>{businessesError.message}</h2>
+  }
 
-  const dispatch = useDispatch()
-
-  useEffect(()=>{
-    getBusinesses(dispatch)
-    },[dispatch])
-
-    const handleDelete = (id) => {
-      console.log(id);
-       DeleteBusiness(dispatch,id)
-       
-      };
+  if (isDeleteBusinessLoading) {
+    return <Loader/>
+  }
+  
+  if (isDeleteBusinessError) {
+    return <h2>{deleteBusinessError.message}</h2>
+  }
+  
+    const handleDelete = (businessId) => {
+      deleteBusinessMutate(businessId)
+    };
 
   const columns = [
     { field: "_id", headerName: "ID", width: 90 },
     {
       field: "title",
-      headerName: "Business",
+      headerName: "Title",
       width: 200,
-      renderCell: (params) => {
-        return (
-          <div className="productListItem">
-            <img className="productListImg" src={params.row.img[0]?.url} alt="" />
-            {params.row.title}
-          </div>
-        );
-      },
     },
-    { field: "categories", headerName: "Categories", width: 200 },
+    { field: "desc", headerName: "Description", width: 200 },
     {
-      field: "owner",
-      headerName: "Owner",
+      field: "country",
+      headerName: "Country",
       width: 120,
     },
     {
-      field: "city",
-      headerName: "City",
+      field: "averageRating",
+      headerName: "Rating",
       width: 160,
     },
     {
@@ -72,13 +69,8 @@ export default function BusinessList() {
 
   return (
     <div className="productList">
-      <div style={{ padding: "10px 0px" }}>
-        <Link to="/newBusiness">
-          <button className="userAddButton">Create</button>
-        </Link>
-      </div>
       <DataGrid
-        rows={businessData.business}
+        rows={businesses.data.businesses}
         getRowId={(row) => row._id}
         disableSelectionOnClick
         columns={columns}

@@ -1,259 +1,209 @@
-const Business = require("../model/Business.js")
-const ErrorHandler = require('../utils/errorHandler.js')
-const catchAsyncErrors= require('../middlewares/catchAsyncErrors')
-const User = require("../model/User.js")
-const APIFeatures= require("../utils/apiFeatures.js")
-const { default: mongoose } = require("mongoose")
-const cloudinary= require("cloudinary").v2
+const Business = require('../model/Business');
+const User = require('../model/User');
+const asyncHandler=require('../middlewares/asyncHandler')
+const ErrorResponse= require("../utils/errorResponse")
+const jwt = require('jsonwebtoken');
+const sharp = require("sharp");
+const cloudinary = require("../config/cloudinary");
 
-// Configuration 
-cloudinary.config({
-    cloud_name: "dkrttx4u2",
-    api_key: "356652623198427",
-    api_secret: "d3ivayyXIq8gWQwJ638gUXF0yZw"
+
+// Create a New Business
+exports.newBusiness = asyncHandler(async (req, res, next) => {
+  const { title, desc, categories, address, city, country } = req.body;
+  console.log(req.files,req.file)
+    // Get the authorization header from the request
+    const authHeader = req.headers.authorization;
+    // If the authorization header doesn't exist, return an error
+    if (!authHeader) {
+      return next(new ErrorResponse('Authorization header missing', 401));
+    }
+    // Extract the token from the authorization header
+    const token = authHeader.split(' ')[1];
+    // Verify the token to get the user ID
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    
+    const userId = decodedToken.id;
+    
+    const images = [];
+   
+    if (req.files) {
+        for (const file of req.files) {
+            const processedImage = await sharp(file.buffer)
+                .resize(500, 500)
+                .jpeg({ quality: 70 })
+                .toBuffer();
+
+            const dataURI = `data:image/jpeg;base64,${processedImage.toString('base64')}`;
+
+            const result = await cloudinary.uploader.upload(dataURI, {
+                resource_type: 'image',
+                format: 'jpg',
+                public_id: `${userId}_${Date.now()}`,
+            });
+
+            images.push({ public_id: result.public_id, url: result.secure_url });
+        }
+    }
+  console.log(images)
+    // Create a new post object with the user ID and post data
+    const business = new Business({
+        title,
+        desc,
+        categories,
+        address,
+        city,
+        country,
+        img: images, // Use the Cloudinary URL here
+        owner: userId,
+      });
+    
+    // Save the new post to the database
+    const savedBusiness = await business.save();
+  
+  
+    // Add the new business to the user's businesses array
+  // You may need to adjust this based on your data model
+  const user = await User.findById(userId);
+  user.businesses.push(savedBusiness._id);
+  await user.save();
+
+  res.status(201).json({
+    success: true,
+    business: savedBusiness,
+  });
+});
+
+// Get All Businesses
+exports.getAllBusinesses = asyncHandler(async (req, res, next) => {
+    const { categories, search, sortBy, page, limit, maxRating } = req.query;
+  
+    // Parse page and limit parameters
+    const parsedPage = parseInt(page, 10) || 1;
+    const parsedLimit = parseInt(limit, 10) || 4;
+    const skip = (parsedPage - 1) * parsedLimit;
+  
+    let query = Business.find();
+  
+    if (categories && categories.length > 0) {
+      const categoriesArray = categories.split(','); // Split the query parameter into an array
+      query = query.or([
+          { categories: { $in: categoriesArray } } // Match businesses with any of the specified categories
+      ]);
+  }
+  
+  if (search) {
+    query = query.find({ title: { $regex: search, $options: 'i' } });
+  }
+  
+
+    if (maxRating) {
+      // Filter businesses with a maximum rating
+      query = query.where({
+        'averageRating': { $lte: parseInt(maxRating) }
+      });
+    }
+  
+    let sortOptions = {};
+  
+    if (sortBy === 'title') {
+      sortOptions.title = 1;
+    } else if (sortBy === '-title') {
+      sortOptions.title = -1;
+    }
+  
+    const totalBusinesses = await Business.countDocuments(query);
+    const totalPages = Math.ceil(totalBusinesses / parsedLimit);
+  
+    query = query.sort(sortOptions).skip(skip).limit(parsedLimit) .populate({
+      path: 'reviews',
+      populate: {
+        path: 'user',
+        select: 'username imgUrl', // Select the fields you want to populate
+      }
+    });
+  
+    const businesses = await query.exec();
+  
+    const pagination = {};
+  
+    if (skip > 0) {
+      pagination.previous = {
+        page: parsedPage - 1,
+        limit: parsedLimit,
+      };
+    }
+  
+    if (skip + parsedLimit < totalBusinesses) {
+      pagination.next = {
+        page: parsedPage + 1,
+        limit: parsedLimit,
+      };
+    }
+  
+    res.status(200).json({
+      success: true,
+      page: parsedPage,
+      limit: parsedLimit,
+      totalPages,
+      totalBusinesses,
+      pagination,
+      businesses,
+    });
+  });
+  
+
+// Get Single Business
+exports.getSingleBusiness = asyncHandler(async (req, res, next) => {
+  const business = await Business.findById(req.params.id) .populate({
+    path: 'reviews',
+    populate: {
+      path: 'user',
+      select: 'username imgUrl', // Select the fields you want to populate
+    }
   });
 
+  if (!business) {
+    return next(new ErrorHandler('Business not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    business,
+  });
+});
+
+// Update Business
+exports.updateBusiness = asyncHandler(async (req, res, next) => {
+  let business = await Business.findById(req.params.id);
+
+  if (!business) {
+    return next(new ErrorHandler('Business not found', 404));
+  }
 
 
-//Posting new business       => /api/business/new
-exports.newBusiness = catchAsyncErrors(async (req, res, next) => {
-     
-    let file= false
+  business = await Business.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
-    req.files.photo ? file = req.files.photo : file = false
+  res.status(200).json({
+    success: true,
+    business,
+  });
+});
 
-    if(file){
-        cloudinary.uploader.upload(file.tempFilePath, (err,result)=>{
-            console.log(result);
-            const business = new Business({
-               title:req.body.title,
-               desc:req.body.desc,
-               categories:req.body.categories,
-               address:req.body.address,
-               city:req.body.city,
-               country:req.body.country,
-               img:[{url:result.url}],
-               owner:req.user._id,
-   
-            })
-            business.save()
-       
-            res.status(200).json({
-                success: true,
-                business
-            })
-       })
-    }else{
-        const business = new Business({
-            title:req.body.title,
-            desc:req.body.desc,
-            categories:req.body.categories,
-            address:req.body.address,
-            city:req.body.city,
-            country:req.body.country,
-            owner:req.user._id,
+// Delete Business
+exports.deleteBusiness = asyncHandler(async (req, res, next) => {
+  const business = await Business.findById(req.params.id);
 
-         })
-         business.save()
-    
-         res.status(200).json({
-             success: true,
-             business
-         })
-    }
-    
+  if (!business) {
+    return next(new ErrorHandler('Business not found', 404));
+  }
 
-  
-}) 
+  await business.remove();
 
-
-
-//Get All business        api/business
-exports.getAllBusiness = catchAsyncErrors( async (req, res, next) => {
-    
-    let resPerPage=4
-    req.query.limit ? resPerPage=req.query.limit : resPerPage=4
-
-    const businessCount=await Business.countDocuments();
-
-    const apiFeatures= new APIFeatures(Business.find(),req.query)
-                       .search()
-                       .filter()
-
-    let business= await apiFeatures.query.clone();
-    let filteredBusinessCount = business.length
-    apiFeatures.pagination(resPerPage)
-    business= await apiFeatures.query;
-
-    res.status(200).json({
-        success: true,
-        businessCount,
-        filteredBusinessCount,
-        count:resPerPage,
-        business,
-        
-    })
-})
-
-// Get single business      api/business/:id
-
-exports.getSingleBusiness = catchAsyncErrors( async (req, res, next) => {
-    var mongoose = require('mongoose');
-
-    if (mongoose.isValidObjectId(req.params.id)) {
-
-        const business = await Business.findById(req.params.id)
-
-        if (!business) {
-            return next(new ErrorHandler('product not found',404))
-        } else {
-            res.status(200).json({
-                success: true,
-                business
-            })
-        }
-    }
-    else {
-        res.status(404).json({
-            success: false,
-            message: "Invalid ID"
-        })
-    }
-})
-
-// Update business      api/business/:id
-exports.updateBusiness = catchAsyncErrors( async (req, res, next) => {
-    var mongoose = require('mongoose');
-
-    if (mongoose.isValidObjectId(req.params.id)) {
-
-        let business = await Business.findByIdAndUpdate(req.params.id,req.body,{new:true, runValidators:true})
-
-        
-            res.status(200).json({
-                success: true,
-                business
-            })
-          
-    }
-    else {
-        res.status(404).json({
-            success: false,
-            message: "Invalid ID"
-        })
-    }
-})
-
-
-
-//delete Business      => /api/business/Id
-exports.deleteBusiness = catchAsyncErrors( async (req, res, next) => {
-    var mongoose = require('mongoose');
-
-    if (mongoose.isValidObjectId(req.params.id)) {
-
-        let business = await Business.findByIdAndDelete(req.params.id)
-
-        
-            res.status(200).json({
-                success: true,
-                message: 'business deleted'
-            })
-          
-    }
-    else {
-        res.status(404).json({
-            success: false,
-            message: "Invalid ID"
-        })
-    }
-})
-
-
-
-//Create new review => /api/business/ review
-
-exports.createBusinessReview = catchAsyncErrors(async(req,res,next)=>{
-    
-    const businessId = req.params.id
-      const {rating,comment}= req.body;
-
-      const review ={
-        user:req.user._id,
-        rating: Number(rating),
-        comment
-      }
-
-     
-
-      const business= await Business.findById(businessId)
-
-      const isReviewed= business.reviews.find(
-        r=> r.user.toString() === req.user._id.toString()
-      )
-
-      if(isReviewed){
-         business.reviews.forEach(review =>{
-            if(review.user.toString() === req.user._id.toString())
-            {
-                review.comment=comment
-                review.rating= rating
-            }
-         })
-      }else{
-        business.reviews.push(review);
-        business.numOfReviews= business.reviews.length
-      }
-
-      business.ratings= business.reviews.reduce((acc,item)=> item.rating+ acc,0)/ business.reviews.length
-      await business.save({validateBeforeSave:false})
-
-      res.status(200).json({
-        success:true
-      })
-})
-
-
-//Get All business Reviews
-exports.getBusinessReviews = catchAsyncErrors(async (req,res,next)=>{
-    const business= await Business.findById(req.params.id);
-    const reviews = await Promise.all(business.reviews.map(async (review)=>{
-        let user = await User.findById(review.user)
-        return {
-            ...review.toObject(),
-            username: user.username
-        }
-    }))
-    
-    res.status(200).json({
-        success:true,
-        reviews: reviews
-    })
-})
-
-
-//Delete review
-exports.deleteReview = catchAsyncErrors(async(req,res,next)=>{
-     const business = await Business.findById(req.query.businessid)
-
-     const reviews = business.reviews.filter(review => review._id.toString() !== req.query.id.toString())
-     
-     const numOfReviews= reviews.length
-     const ratings=business.reviews.reduce((acc,item)=> item.rating +acc ,0)/ reviews.length
-     
-     await Business.findByIdAndUpdate(req.query.businessid,{
-        reviews,
-        ratings,
-        numOfReviews
-     },{
-        new:true,
-        runValidators:true,
-        useFindAndModify: false
-
-     })
-
-     res.status(200).json({
-        success: true,
-        
-     })
-})
+  res.status(200).json({
+    success: true,
+    message: 'Business deleted',
+  });
+});

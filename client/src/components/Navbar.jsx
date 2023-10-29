@@ -1,18 +1,26 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import {Link, useNavigate} from 'react-router-dom';
-import { logout } from '../redux/apiCalls/userApiCalls';
+import { useSelector } from 'react-redux';
+import {Link} from 'react-router-dom';
+import Loader from "../components/Loader";
+import { useGetUserDetails, useLogout } from '../apiCalls/userApiCalls';
+
 
 function Navbar() {
 
   const {currentUser} = useSelector(state=>state.userSlice)
-  const dispatch = useDispatch()
-  const Navigate = useNavigate()
+  const userId = currentUser?.data._id
 
-  const logoutHandler = () => {
-    logout(dispatch)
-    Navigate('/')
-  }
+  const { mutate: logoutMutate, isLoading: isLogoutLoading } = useLogout();
+ 
+  const { isLoading: isUserLoading, data: userDetails } = useGetUserDetails(userId)
+
+ 
+
+  const handleLogout = () => {
+    logoutMutate();
+  };
+
+  const fallbackImage = '/assets/avatar.jpg';
 
   return (
     <div className="navbar mx-10 my-3">
@@ -24,18 +32,38 @@ function Navbar() {
             <div className="nav-links">
                 <ul className="flex space-x-5 items-center">
                 <li className="text-lg font-normal nav-link"><Link to='/search'>Search</Link></li>
+                <li className="text-lg font-normal nav-link"><Link to="#aboutUs">About</Link></li>
+                <li className="text-lg font-normal nav-link"><a href="/#contact">Contact</a></li>
                   {currentUser ? (
                   <>
                   <li className="text-lg font-normal nav-link"><Link to='/list'>List</Link></li>
-                    <li className="text-lg font-normal nav-link"><Link to="/profile">Profile</Link></li>
-                    <li className="text-base text-center  font-normal nav-link bg-slate-200 px-5 py-2 rounded-lg btn hover:drop-shadow-sm" onClick={logoutHandler}><Link
+                  
+                  <li className="">
+                
+                    <Link to={'/profile'}>
+                    <div className="Profile">
+                      <div
+                        className="w-8 h-8 bg-slate-300 rounded-full"
+                        style={{
+                          backgroundImage: `url("${userDetails?.data.user?.imgUrl}"), url("${fallbackImage}")`,
+                          backgroundPosition: 'center',
+                          backgroundSize: 'cover',
+                          backgroundRepeat: 'no-repeat',
+                        }}
+                      ></div>
+                    </div>
+                    </Link>
+               
+          </li>
+                      
+                    <li onClick={handleLogout} className="text-base text-center font-normal nav-link bg-slate-200 px-5 py-2 rounded-lg btn hover:drop-shadow-sm" ><Link
                             to="/logout">Logout</Link></li>
                   </>
                   ) : (
                     <>
-                    <li className="text-base text-center  font-normal nav-link bg-slate-200 px-5 py-2 rounded-lg btn hover:drop-shadow-sm"><Link
+                    <li className="text-base text-center font-normal nav-link bg-slate-200 px-5 py-2 rounded-lg btn hover:drop-shadow-sm"><Link
                             to="/signup">Sign up</Link></li>
-                    <li className="text-base text-center  font-normal nav-link bg-slate-200 px-5 py-2 rounded-lg btn hover:drop-shadow-sm"><Link
+                    <li className="text-base text-center font-normal nav-link bg-slate-200 px-5 py-2 rounded-lg btn hover:drop-shadow-sm"><Link
                             to="/signin">Sign in</Link></li>
                     </>
                   )

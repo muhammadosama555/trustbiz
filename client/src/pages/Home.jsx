@@ -11,8 +11,12 @@ function Home() {
     <>
     <Hero/>
     <Businesses/>
+    <div id='aboutUs'>
     <AboutUs/>
+    </div>
+    <div id='contact'>
     <ContactUs/>
+    </div>
     </>
   )
 }

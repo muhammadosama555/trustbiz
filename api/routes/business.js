@@ -1,19 +1,16 @@
 const express= require("express");
-const { newBusiness, getAllBusiness, getSingleBusiness, updateBusiness, deleteBusiness, createBusinessReview, getBusinessReviews, deleteReview,  } = require("../controller/businessController");
-const { isAuthenticatedUser } = require("../middlewares/auth");
-const router=require("express").Router();
+const upload = require("../middlewares/multer");
+const { getAllBusinesses, newBusiness, getSingleBusiness, updateBusiness, deleteBusiness } = require("../controller/businessController");
+const router=express.Router();
 
 
 
+router.get("/",getAllBusinesses)
+router.post("/",upload.array("images",5),newBusiness)
+router.get("/:id",getSingleBusiness)
+router.put("/:id", updateBusiness)
+router.delete("/:id", deleteBusiness)
 
-router.post("/business/new",isAuthenticatedUser,newBusiness)
-router.get("/business/all",getAllBusiness)
-router.get("/business/:id",getSingleBusiness)
-router.put("/business/:id",isAuthenticatedUser, updateBusiness)
-router.delete("/business/:id",isAuthenticatedUser, deleteBusiness)
-router.put("/:id/review",isAuthenticatedUser, createBusinessReview)
-router.get("/:id/reviews",isAuthenticatedUser,getBusinessReviews)
-router.delete("/reviews", isAuthenticatedUser,deleteReview)
 
 
 
