@@ -43,15 +43,6 @@ const BusinessSchema= new mongoose.Schema({
     },
 })
 
-// Calculate the average rating and update the 'averageRating' field
-BusinessSchema.methods.calculateAverageRating = function () {
-    const reviews = this.reviews;
-    if (reviews.length === 0) {
-        this.averageRating = 0;
-    } else {
-        const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-        this.averageRating = totalRating / reviews.length;
-    }
-};
+
 
 module.exports= mongoose.model("Business",BusinessSchema)

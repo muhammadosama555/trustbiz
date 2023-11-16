@@ -88,6 +88,42 @@ function Search() {
                   />
                 <label for="text">Media</label>
               </div>
+              <div className="flex gap-3">
+                <input
+                 className="w-4"
+                  type="checkbox"
+                  checked={categories.includes("Entertainment")} 
+                  onChange={() => handleCategoriesSelection("Entertainment")}
+                  />
+                <label for="text">Entertainment</label>
+              </div>
+              <div className="flex gap-3">
+                <input
+                 className="w-4"
+                  type="checkbox"
+                  checked={categories.includes("Fashion")} 
+                  onChange={() => handleCategoriesSelection("Fashion")}
+                  />
+                <label for="text">Fashion</label>
+              </div>
+              <div className="flex gap-3">
+                <input
+                 className="w-4"
+                  type="checkbox"
+                  checked={categories.includes("Athletics")} 
+                  onChange={() => handleCategoriesSelection("Athletics")}
+                  />
+                <label for="text">Athletics</label>
+              </div>
+              <div className="flex gap-3">
+                <input
+                 className="w-4"
+                  type="checkbox"
+                  checked={categories.includes("Food")} 
+                  onChange={() => handleCategoriesSelection("Food")}
+                  />
+                <label for="text">Food</label>
+              </div>
             </div>
           </div>
           <div className="rating pl-6 py-4 border-t border-b border-gray-200">

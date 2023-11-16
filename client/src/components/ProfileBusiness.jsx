@@ -30,7 +30,12 @@ const renderStars = (rating) => {
     <div className="card flex h-60 relative shadow rounded-xl overflow-hidden">
     <div
       className="contact rounded-l-lg bg-cover w-56 h-60 "
-      Style="background-image: url('assets/profile1.jpg');"
+      style={{
+        backgroundImage: `url("${business?.img[0].url}")`,
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+      }}
     ></div>
     <div className="flex flex-col pl-10">
       <div className="desc">

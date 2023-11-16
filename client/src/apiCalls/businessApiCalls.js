@@ -85,3 +85,32 @@ export const useUpdateBusiness = () => {
     },
   });
 };
+
+// update business images
+
+export const updateBusinessImages = async (businessData) => {
+  console.log(businessData)
+  const currentUser = store.getState().userSlice.currentUser;
+  const token = currentUser ? currentUser.token : null;
+  return axios.put(
+    `${API_BASE_URL}/businesses/update-business-images/${businessData.businessId}`,
+    businessData,
+    {
+      headers: {
+        authorization: "Bearer " + token,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+};
+
+export const useUpdateBusinessImages = () => {
+  const queryClient = useQueryClient();
+  return useMutation(updateBusinessImages, {
+    onSuccess: (data) => {
+      console.log(data)
+      queryClient.invalidateQueries("business");
+   
+    },
+  });
+};

@@ -86,9 +86,10 @@ exports.getAllBusinesses = asyncHandler(async (req, res, next) => {
   
     if (categories && categories.length > 0) {
       const categoriesArray = categories.split(','); // Split the query parameter into an array
-      query = query.or([
-          { categories: { $in: categoriesArray } } // Match businesses with any of the specified categories
-      ]);
+      // Console log to check categoriesArray
+    console.log('categoriesArray:', categoriesArray);
+
+      query = query.and(categoriesArray.map(category => ({ categories: category })));
   }
   
   if (search) {
@@ -191,6 +192,48 @@ exports.updateBusiness = asyncHandler(async (req, res, next) => {
     business,
   });
 });
+
+// Update Business Images
+exports.updateBusinessImages = asyncHandler(async (req, res, next) => {
+  const business = await Business.findById(req.params.id);
+
+  if (!business) {
+    return next(new ErrorHandler('Business not found', 404));
+  }
+
+  // Process and upload new images if they exist in the request
+  const updatedImages = [];
+  if (req.files) {
+    for (const file of req.files) {
+      const processedImage = await sharp(file.buffer)
+        .resize(500, 500)
+        .jpeg({ quality: 70 })
+        .toBuffer();
+
+      const dataURI = `data:image/jpeg;base64,${processedImage.toString('base64')}`;
+
+      const result = await cloudinary.uploader.upload(dataURI, {
+        resource_type: 'image',
+        format: 'jpg',
+        public_id: `${business.owner}_${Date.now()}`,
+      });
+
+      updatedImages.push({ public_id: result.public_id, url: result.secure_url });
+    }
+  }
+
+  // Replace existing images with updated images
+  business.img = updatedImages;
+
+  // Save the updated business to the database
+  const updatedBusiness = await business.save();
+
+  res.status(200).json({
+    success: true,
+    business: updatedBusiness,
+  });
+});
+
 
 // Delete Business
 exports.deleteBusiness = asyncHandler(async (req, res, next) => {

@@ -1,51 +1,51 @@
 import React, { useRef, useState } from "react";
-import { useCreateBusiness } from "../apiCalls/businessApiCalls";
+import { createBusiness, useCreateBusiness } from "../apiCalls/businessApiCalls";
 import Select from 'react-select';
 
 function List() {
   const titleInputElement = useRef();
   const descInputElement = useRef();
   const categoriesInputElement = useRef([]);
-  const imagesInputElement = useRef(null);
+  const imagesInputElement = useRef();
   const addressInputElement = useRef();
   const cityInputElement = useRef();
   const countryInputElement = useRef();
-  const [selectedImages, setSelectedImages] = useState([]);
+  
 
   const { mutate: createBusinessMutate } = useCreateBusiness();
 
-  const handleImageChange = (event) => {
-    const selectedFiles = Array.from(event.target.files);
-    imagesInputElement.current = selectedFiles;
-    setSelectedImages(selectedFiles); // Update the selected images state
-  };
+  
 
   const handleCategoriesChange = (selectedOptions) => {
     const categoryValues = selectedOptions.map(option => option.value);
     categoriesInputElement.current = categoryValues;
   };
   
-  
-
   const handleSubmit = (event) => {
     event.preventDefault();
-
-
-    const data = {
-      title: titleInputElement.current.value,
-      desc: descInputElement.current.value,
-      categories: categoriesInputElement.current,
-      images: selectedImages,
-      address: addressInputElement.current.value,
-      city: cityInputElement.current.value,
-      country: countryInputElement.current.value,
-    };
-    console.log(data)
-
-    createBusinessMutate(data);
+  
+    const formData = new FormData();
+    formData.append('title', titleInputElement.current?.value);
+    formData.append('desc', descInputElement.current?.value);
+    formData.append('categories', categoriesInputElement.current);
+    formData.append('address', addressInputElement.current?.value);
+    formData.append('city', cityInputElement.current?.value);
+    formData.append('country', countryInputElement.current?.value);
+  
+    // Append each selected file to FormData
+    const files = imagesInputElement.current?.files;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        formData.append('images', files[i]);
+      }
+    }
+   createBusinessMutate(formData);
+   console.log(formData)
+    
   };
 
-  const allCategories = ["Sports","Education","Art","Media"]
+
+  const allCategories = ["Sports","Education","Art","Media","Entertainment","Fashion","Athletics","Food"]
 
   const options = allCategories.map(category => ({ value: category, label: category }));
 
@@ -82,16 +82,18 @@ function List() {
              
           </div>
           <div className="flex flex-col gap-2 w-1/3">
-            <label className="text-xl pl-1" htmlFor="images">
+            <label className="text-xl pl-1" >
               Images
             </label>
             <input
               className="w-full px-4 py-2 placeholder:text-gray-300 rounded-md border border-gray-200 bg-gray-50"
               type="file"
-              id="images"
-              name="images"
-              multiple // Allows selecting multiple files
-              onChange={handleImageChange}
+            id="file"
+            ref={imagesInputElement} 
+            onChange={(e) => console.log(e.target.files)} 
+            accept="image/*"
+            multiple 
+            
             />
           </div>
         </div>

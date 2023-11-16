@@ -14,15 +14,9 @@ function Hero() {
           <span className="font-bold">Trust</span>Biz
         </h1>
         <p className="text-gray-700 text-lg font-light w-2/5 py-3">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae
-          vero ipsam tempora delectus obcaecati ex quis magni voluptate
-          eligendi. Dignissimos sit et ut maiores. Possimus nisi illo sit neque
-          quibusdam Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad
-          ducimus alias odio corporis voluptatem doloribus nostrum culpa
-          quibusdam sequi beatae. Lorem ipsum dolor sit amet consectetur,
-          adipisicing elit. Voluptatem, sed! Lorem ipsum dolor sit amet
-          consectetur adipisicing elit. Sint voluptatem, dolorum doloribus
-          impedit adipisci natus?
+        Welcome to Trust Biz, where your business finds its digital home! 🏢✨
+
+In the dynamic landscape of commerce, standing out is key, and Trust Biz is your passport to visibility and success. We understand that your business is more than just a venture; it's a journey built on trust, credibility, and dedication.At Trust Biz, we've created a platform that goes beyond mere listings – it's a community where businesses connect, grow, and thrive. Whether you're a local boutique, a tech startup, or a family-owned restaurant, Trust Biz provides a stage for your story to unfold.
         </p>
        
       </div>

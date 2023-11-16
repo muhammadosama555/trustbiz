@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import Select from 'react-select';
-import { useGetBusinessDetails, useUpdateBusiness } from "../apiCalls/businessApiCalls";
+import { useGetBusinessDetails, useUpdateBusiness, useUpdateBusinessImages } from "../apiCalls/businessApiCalls";
 import { useParams } from "react-router-dom";
 import Loader from "../components/Loader";
 
@@ -11,6 +11,8 @@ function EditBusiness() {
   const addressInputElement = useRef();
   const cityInputElement = useRef();
   const countryInputElement = useRef();
+  const imagesInputElement = useRef();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const {businessId} = useParams()
 
@@ -24,6 +26,8 @@ function EditBusiness() {
     isError: isUpdateBusinessError,
     error: updateBusinessError,
   } = useUpdateBusiness();
+
+  const { mutate: updateBusinessImagesMutate, isLoading: isUpdateBusinessImagesLoading, isError: isUpdateBusinessImagesError, error: updateBusinessImagesError, } = useUpdateBusinessImages();
 
 
   const handleCategoriesChange = (selectedOptions) => {
@@ -51,17 +55,104 @@ function EditBusiness() {
     updateBusinessMutate(data);
   };
 
+  const handleImagesChange = (event) => {
+    event.preventDefault();
+  
+    const formData = new FormData();
+    formData.append('businessId', businessId);
+    
+    // Append each selected file to FormData
+    const files = imagesInputElement.current?.files;
+    if (files && files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        formData.append('images', files[i]);
+      }
+  
+      // Call the mutation function to update business images
+      updateBusinessImagesMutate(formData);
+    } else {
+      // Handle the case where no files are selected
+      console.error('No files selected.');
+    }
+  };
+  
+
   const allCategories = ["Sports","Education","Art","Media"]
   const countryOptions = ["Pakistan", "USA", "UK"];
   const cityOptions = ["Islamabad", "Rawalpindi", "Karachi"];
 
   const options = allCategories.map(category => ({ value: category, label: category }));
 
+  const nextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % businessDetails.data.business.img.length);
+  };
+  
+  const prevImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + businessDetails.data.business.img.length) % businessDetails.data.business.img.length);
+  };
+
   return (
     <>
     {isBusinessLoading ? <Loader/> :
     <div className="list-a-business mx-32 mt-10 flex flex-col items-center pb-10">
+
       <h1 className="w-full text-4xl">Edit a business</h1>
+
+          {/* Carousel and Description Layout */}
+    
+            {/* Carousel (60% width) */}
+            <div className="w-40  relative">
+              {/* Previous Button */}
+              <button
+                className="absolute top-1/2   bg-gray-800 p-2  rounded-full text-white"
+                onClick={prevImage}
+              >
+                &lt;
+              </button>
+
+              {/* Image */}
+              <img
+                src={businessDetails.data.business.img[currentImageIndex].url}
+                alt="Business Image"
+                className="mx-auto max-w-full h-56 rounded-lg"
+              />
+
+              {/* Next Button */}
+              <button
+                className="absolute top-1/2 right-0 bg-gray-800 p-2 rounded-full text-white"
+                onClick={nextImage}
+              >
+                &gt;
+              </button>
+            </div>
+
+            {/* File Input for Updating Images */}
+          <form >
+            <div className="mb-5">
+              <label className="text-xl pl-1">
+                Update Images
+              </label>
+              <input
+                type="file"
+                id="file"
+                multiple
+                accept="image/*"
+                ref={imagesInputElement}
+                onChange={handleImagesChange} 
+              />
+            </div>
+            <div className="w-full flex justify-end py-5">
+              <button className="text-base text-center font-normal nav-link bg-slate-200 px-6 py-2 rounded-lg btn hover:drop-shadow-sm" type="submit">
+                Update Images
+              </button>
+            </div>
+          </form>
+
+
+          
+      
+
+
       <form className="mt-14 w-2/3" onSubmit={handleSubmit}>
         <div className="flex gap-10 mb-5">
           <div className="flex flex-col gap-2 w-1/3">

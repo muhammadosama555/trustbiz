@@ -5,6 +5,8 @@ import { useParams } from "react-router-dom";
 import { usePostReview } from "../apiCalls/reviewApiCalls";
 import StarRating from "../components/StarRating";
 import { useSelector } from "react-redux";
+import moment from 'moment';
+
 
 function BusinessDetails() {
  
@@ -14,9 +16,9 @@ function BusinessDetails() {
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [isReviewFormVisible, setReviewFormVisible] = useState(false);
-
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const {currentUser} = useSelector(state=>state.userSlice)
-  const userId = currentUser.data._id
+  const userId = currentUser?.data._id
 
  
   const { isLoading: isBusinessLoading, data: businessDetails } = useGetBusinessDetails(businessId)
@@ -68,15 +70,27 @@ const submitReview = (event) => {
   setDisplayedReviews(totalReviews);
 };
 
+
+
+
+const nextImage = () => {
+  setCurrentImageIndex((prevIndex) => (prevIndex + 1) % businessDetails.data.business.img.length);
+};
+
+const prevImage = () => {
+  setCurrentImageIndex((prevIndex) => (prevIndex - 1 + businessDetails.data.business.img.length) % businessDetails.data.business.img.length);
+};
+
 const fallbackImage = '/assets/avatar.jpg';
+
   return (
     <>
     {isBusinessLoading ? <Loader/> : (
       <>
-       <div className="hero mx-10 overflow-hidden">
+ <div className="hero mx-10 overflow-hidden">
         <div
           className="hero relative rounded-2xl bg-cover bg-center h-[750px]"
-          style={{backgroundImage: `url(${businessDetails.data.business.img[0].url})`}}
+          style={{backgroundImage: `url(${businessDetails.data.business.img[businessDetails.data.business.img.length-1].url})`}}
         >
           <div className="h-full w-full bg-black absolute z-10 rounded-2xl bg-opacity-40"></div>
           <div className="hero-content text-white z-20 absolute flex w-full items-end justify-between bottom-20 px-14">
@@ -84,27 +98,63 @@ const fallbackImage = '/assets/avatar.jpg';
               <h1 className="text-5xl font-bold">{businessDetails.data.business.title}</h1>
               <h3 className="text-3xl font-light">{businessDetails.data.business.categories[0]}</h3>
             </div>
+
+
+            
+      {businessDetails.data.business?.reviews.length > 0 ? 
+
             <div className="right flex flex-col gap-3 pr-5 pb-5">
-              <h1 className="text-xl font-light">{businessDetails.data.business.reviews.length} reviews</h1>
+              <h1 className="text-xl font-light">{businessDetails.data.business.reviews.length} {businessDetails.data.business.reviews.length === 1 ? "review" : "reviews"}</h1>
               <div className="rating-outer">
                <div className="rating-inner" style={{width: `${(businessDetails.data.business.averageRating/5)*100}%`}}></div>
               </div>
-            </div>
+            </div> : null }
           </div>
         </div>
       </div>
-      <div className="description mx-24 my-14 flex">
-        <div className="left flex flex-col gap-2">
-          <h1 className="text-2xl">Description</h1>
-          <p className="text-base font-light pr-8">
-           {businessDetails.data.business.desc}
-          </p>
-        </div>
-        <div className="right map-image w-full flex justify-end rounded-xl overflow-hidden">
-          <img className="h-64 w-full" src="../assets/map.jpg" alt="" />
-        </div>
-      </div>
-      {businessDetails.data.business?.reviews ? 
+
+
+
+     {/* Carousel and Description Layout */}
+     <div className="flex mx-24 my-14">
+            {/* Carousel (60% width) */}
+            <div className="w-2/3  relative">
+              {/* Previous Button */}
+              <button
+                className="absolute top-1/2 left-52  bg-gray-800 p-2  rounded-full text-white"
+                onClick={prevImage}
+              >
+                &lt;
+              </button>
+
+              {/* Image */}
+              <img
+                src={businessDetails.data.business.img[currentImageIndex].url}
+                alt="Business Image"
+                className="mx-auto max-w-full h-96 rounded-lg"
+              />
+
+              {/* Next Button */}
+              <button
+                className="absolute top-1/2 right-52  bg-gray-800 p-2 rounded-full text-white"
+                onClick={nextImage}
+              >
+                &gt;
+              </button>
+            </div>
+
+            {/* Description (40% width) */}
+            <div className="w-1/3 justify-center my-auto">
+              <h1 className="text-2xl">Description</h1>
+              <p className="text-base font-light">
+                {businessDetails.data.business.desc}
+              </p>
+            </div>
+          </div>
+
+
+
+      {businessDetails.data.business?.reviews.length > 0 ? 
       <div className="reviews mx-24">
             <h1 className="text-2xl pb-5">Reviews</h1>
             {businessDetails.data.business.reviews.slice(0, displayedReviews).map((review) => (
@@ -119,7 +169,7 @@ const fallbackImage = '/assets/avatar.jpg';
                 <div className="flex flex-grow flex-col">
                   <div className="flex justify-between">
                     <h1 className="text-lg">{review.title}</h1>
-                    <h2 className="text-gray-300 text-sm">{review.createdAt}</h2>
+                    <h2 className="text-gray-300 text-sm">{moment(review.createdAt).format('MMMM Do YYYY, h:mm a')}</h2>
                   </div>
                   <p className="font-light text-gray-600 pt-2">{review.text}</p>
                   <div className="rating">
@@ -173,7 +223,7 @@ const fallbackImage = '/assets/avatar.jpg';
                 </div>
               </form>
             </div>
-          ) : businessDetails?.data.business.owner !== userId &&  businessDetails?.data.business.reviews.some((review) => review.user._id !== userId)  ? (
+          ) : businessDetails?.data.business.owner !== userId  ? (
             <div className="w-full text-center py-5">
               <button onClick={() => setReviewFormVisible(true)} className="text-base text-center nav-link font-normal bg-slate-200 px-5 py-2 rounded-lg hover:drop-shadow-sm">
                 Write a Review

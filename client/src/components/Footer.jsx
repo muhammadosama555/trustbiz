@@ -1,7 +1,13 @@
 import React from 'react'
+import { useSelector } from 'react-redux';
 import {Link} from 'react-router-dom';
 
+
 function Footer() {
+
+    const {currentUser} = useSelector(state=>state.userSlice)
+   
+
   return (
     <footer className="flex flex-col justify-center h-[480px] text-white"
     style={{background: `linear-gradient(262.22deg, #779DCA -4.78%, #192A3D 98.21%)`}}>
@@ -43,13 +49,24 @@ function Footer() {
     </div>
     <div className="last-line flex justify-between mx-56 pt-4">
         <div className="links flex gap-4 font-light text-slate-300 ">
-            <Link className="hover:text-white" to="/search">Search Businesses</Link>
-            <Link className="hover:text-white" to="/list">List a Business</Link>
+            {currentUser ? 
+        (
+            <>
+             <Link className="hover:text-white" to="/list">List a Business</Link>
             <Link className="hover:text-white" to="/profile">Profile</Link>
+            </>
+        )  :
+        (
+            <>
+             <Link className="hover:text-white" to="/search">Search Businesses</Link>
             <Link className="hover:text-white" to="/signin">Sign in</Link>
             <Link className="hover:text-white" to="/signup">Sign up</Link>
+            </>
+        )  
+        }
+           
         </div>
-        <div className="text-slate-300">Copyright © 2018 • Lift Media Inc.</div>
+        <div className="text-slate-300">Copyright © 2023 • Outray Tech Ltd.</div>
     </div>
 
 

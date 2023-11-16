@@ -14,20 +14,7 @@ function AboutUs() {
 
             </div>
             <div className="right w-1/3">
-                <p className="text-gray-700 text-lg font-light">Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                    Soluta placeat nisi itaque suscipit quia
-                    in,
-                    facere repudiandae eligendi ducimus autem ex laboriosam voluptate. Architecto itaque, in animi
-                    facilis
-                    labore, provident pariatur sed cumque qui, neque possimus corporis ea quae eos cupiditate dolore
-                    libero
-                    at et! Odit animi atque debitis, impedit aperiam quod nam maiores recusandae consequuntur doloremque
-                    saepe quaerat. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos est cum laudantium
-                    expedita dolore enim, rm rerum eligendi neque quis atque consequuntur asperiores veritatis facere.
-                    Voluptate consequatur quo reprehenderit recusandae inventore maxime praesentium optio soluta eveniet
-                    deleniti eligendi repudiandae, vitae reiciendis illo. Officia a voluptas eveniet accusamus!
-                    Voluptatibus pariatur facilis in atque quam ea, debitis recusandae quidem harum dicta eligendi nemo
-                    ipsum reiciendis provident aperiam reprehenderit illo numquam ?</p>
+                <p className="text-gray-700 text-lg font-light">Welcome to Trust Biz, where the heartbeat of commerce syncs with the rhythm of community. Founded on the belief that every business has a unique story to tell, Trust Biz is more than a platform; it's a digital canvas for entrepreneurs, dreamers, and doers.In a world buzzing with transactions, we noticed a gap – the need for a platform that not only showcased businesses but celebrated their individuality. Trust Biz was born from the idea that behind every business name is a journey, a passion, and a promise. We envisioned a space where businesses, big or small, could thrive, connect, and contribute to the vibrant tapestry of commerce.We invite you to be a part of the Trust Biz community, where your business is not just a name on a page but a vibrant entity contributing to the mosaic of entrepreneurship. Together, let's redefine success, celebrate uniqueness, and build a legacy that extends far beyond transactions.</p>
             </div>
         </div>
     </div>

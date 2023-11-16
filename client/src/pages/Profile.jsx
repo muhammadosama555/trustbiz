@@ -66,7 +66,7 @@ console.log(userDetails?.data)
         ></div>
         <div className="profile-desc space-y-6">
           <div className="flex flex-col gap-2 w-96">
-            <label className="text-xl pl-1" for="title">
+            <label className="text-xl pl-1" >
               Name
             </label>
             <input
@@ -80,7 +80,7 @@ console.log(userDetails?.data)
             />
           </div>
           <div className="flex flex-col gap-2 w-96">
-            <label className="text-xl pl-1" for="title">
+            <label className="text-xl pl-1" >
               Email
             </label>
             <input
@@ -94,7 +94,7 @@ console.log(userDetails?.data)
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-xl pl-1" htmlFor="file">
+            <label className="text-xl pl-1" >
               Profile Picture
             </label>
               <input
@@ -108,12 +108,12 @@ console.log(userDetails?.data)
               />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-xl pl-1" for="title">
+            <label className="text-xl pl-1" >
               Contact
             </label>
             <input
               className="w-full px-4 py-2 placeholder:text-gray-300 rounded-md border border-gray-200 bg-gray-50"
-              type="number"
+              type="text"
               id="contact"
               name="contact"
               defaultValue={userDetails.data.user.contact}
@@ -126,7 +126,7 @@ console.log(userDetails?.data)
           Save
         </button>
       </div>
-      {userDetails.data.user.businesses ?
+      {userDetails.data.user.businesses.length > 0 ?
       <div className="bottom mx-32 pt-10">
         <h1 className="text-4xl">Businesses</h1>
         <div className="cards section mt-10 mb-20 flex flex-col gap-8">

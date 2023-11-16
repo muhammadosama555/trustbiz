@@ -1,4 +1,5 @@
 const mongoose=require('mongoose')
+const Business = require('./Business.js'); // Import the Product model
 
 
 const ReviewSchema = new mongoose.Schema({
@@ -33,9 +34,25 @@ const ReviewSchema = new mongoose.Schema({
         required:true
     }
 })
-//Preventing user from submitting more than 1 review
-ReviewSchema.index({business:1, user: 1},{unique:true})
 
+
+// Define a post middleware to update the average rating when a review is added, updated, or deleted
+ReviewSchema.post(['save', 'findOneAndUpdate', 'remove'], async function (doc) {
+    const business = await Business.findById(doc.business);
+    if (!business) {
+      return;
+    }
+  
+    const reviews = await this.model('Review').find({ business: doc.business });
+    if (reviews.length === 0) {
+      business.averageRating = 0;
+    } else {
+      const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+      business.averageRating = totalRating / reviews.length;
+    }
+  
+    await business.save();
+  });
 
 
 module.exports=mongoose.model('Review',ReviewSchema)

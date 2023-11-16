@@ -5,6 +5,7 @@ import Loader from "../components/Loader";
 import { useGetUserDetails, useLogout } from '../apiCalls/userApiCalls';
 
 
+
 function Navbar() {
 
   const {currentUser} = useSelector(state=>state.userSlice)
@@ -32,8 +33,9 @@ function Navbar() {
             <div className="nav-links">
                 <ul className="flex space-x-5 items-center">
                 <li className="text-lg font-normal nav-link"><Link to='/search'>Search</Link></li>
-                <li className="text-lg font-normal nav-link"><Link to="#aboutUs">About</Link></li>
-                <li className="text-lg font-normal nav-link"><a href="/#contact">Contact</a></li>
+               
+                <li className="text-lg font-normal nav-link"><a href='/#about'>About</a></li>
+        
                   {currentUser ? (
                   <>
                   <li className="text-lg font-normal nav-link"><Link to='/list'>List</Link></li>
