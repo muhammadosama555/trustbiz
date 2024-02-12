@@ -8,7 +8,7 @@ import { useDeleteBusiness, useGetBusinesses } from "../../apiCalls/businessApiC
 export default function BusinessList() {
   const {isLoading:isBusinessesLoading, data:businesses, isError:isBusinessesError, error:businessesError} = useGetBusinesses()
   const {mutate:deleteBusinessMutate, isLoading:isDeleteBusinessLoading, isError:isDeleteBusinessError, error:deleteBusinessError} = useDeleteBusiness();
-
+  console.log(businesses?.data)
   if (isBusinessesLoading) {
     return <Loader/>
   }
@@ -30,22 +30,31 @@ export default function BusinessList() {
     };
 
   const columns = [
-    { field: "_id", headerName: "ID", width: 90 },
+    { field: "_id", headerName: "ID", width: 200 },
     {
       field: "title",
       headerName: "Title",
       width: 200,
     },
-    { field: "desc", headerName: "Description", width: 200 },
-    {
-      field: "country",
-      headerName: "Country",
-      width: 120,
-    },
     {
       field: "averageRating",
       headerName: "Rating",
       width: 160,
+    },
+    {
+      field: "reviews",
+      headerName: "Reviews",
+      width: 150,
+      renderCell: (params) => {
+        return (
+          <>
+            <Link to={"/business/" + params.row._id + "/reviews"}>
+              <button className="productListEdit">View</button>
+            </Link>
+           
+          </>
+        );
+      },
     },
     {
       field: "action",

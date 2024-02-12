@@ -98,9 +98,11 @@ function SignIn() {
                   />
                 </div>
               </div>
+              <Link to='/forgetPassword'>
               <button className="text-blue-400 hover:text-blue-500 flex justify-end px-2">
                 Forgot Password
               </button>
+              </Link>
             </div>
           </div>
         

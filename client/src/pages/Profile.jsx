@@ -1,8 +1,13 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import ProfileBusiness from "../components/ProfileBusiness";
-import { useGetUserDetails, useUpdateProfile, useUpdateUserImage } from "../apiCalls/userApiCalls";
+import { useChangePassword, useGetUserDetails, useUpdateProfile, useUpdateUserImage } from "../apiCalls/userApiCalls";
 import Loader from "../components/Loader";
+import Dialog from '@material-ui/core/Dialog';
+import { MailOutlined, LockOutlined, VisibilityOff, Visibility, Close  } from '@mui/icons-material';
+import { ArrowBackIos } from '@mui/icons-material';
+
+
 
 
 function Profile() {
@@ -10,6 +15,15 @@ function Profile() {
   const usernameInputElement = useRef();
   const emailInputElement = useRef();
   const contactInputElement = useRef();
+
+  const oldPasswordInputElement = useRef();
+  const newPasswordInputElement = useRef();
+
+  const [openChangePassword, setOpenChangePassword] = useState(false)
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+
+ 
 
   const { currentUser } = useSelector(state => state.userSlice) || null
   const userId = currentUser.data._id
@@ -24,6 +38,21 @@ console.log(userDetails?.data)
       isError: isUpdateProfileError,
       error: updateProfileError,
     } = useUpdateProfile();
+    const { mutate: changePasswordMutate, isLoading: isChangePasswordLoading, isError: isChangePasswordError, error: changePasswordError } = useChangePassword();
+
+
+
+
+    const changePasswordHandler = (event) => {
+      event.preventDefault();
+      const data = {
+        oldPassword: oldPasswordInputElement.current?.value,
+        newPassword: newPasswordInputElement.current?.value,
+  
+      };
+      changePasswordMutate(data);
+
+    };
   
     const handleSubmit = (event) => {
       event.preventDefault();
@@ -47,6 +76,19 @@ console.log(userDetails?.data)
       updateUserImageMutate(imageData);
     };
 
+    const closeChangePasswordHandler = () => {
+      setOpenChangePassword(false)
+    }
+
+    const handleToggleOldPassword = () => {
+      setShowOldPassword(!showOldPassword);
+  
+    };
+    const handleToggleNewPassword = () => {
+  
+      setShowNewPassword(!showNewPassword);
+    };
+  
 
     const fallbackImage = '/assets/avatar.jpg';
 
@@ -122,9 +164,70 @@ console.log(userDetails?.data)
             />
           </div>
         </div>
-        <button onClick={handleSubmit} className="absolute right-0 bottom-0 text-base text-center  font-normal nav-link bg-slate-200 px-7 py-2 rounded-lg btn hover:drop-shadow-sm">
+        <button onClick={handleSubmit} className="absolute right-60 bottom-0 text-base text-center  font-normal nav-link bg-slate-200 px-7 py-2 rounded-lg btn hover:drop-shadow-sm">
           Save
         </button>
+        <button onClick={()=>setOpenChangePassword(true)} className="absolute right-0 bottom-0 text-base text-center  font-normal nav-link bg-slate-200 px-7 py-2 rounded-lg btn hover:drop-shadow-sm">
+          Change Password
+        </button>
+
+        <Dialog open={openChangePassword} onClose={closeChangePasswordHandler}>
+  <div className="p-4">
+    <Close
+      style={{ position: 'absolute', right: 10, top: 10 }}
+      onClick={closeChangePasswordHandler}
+    />
+    
+    <h1 className="text-lg font-semibold mb-4">Change Password</h1>
+
+    <form onSubmit={changePasswordHandler}>
+      {/* Old Password */}
+      <div>
+        <label htmlFor="oldPassword" className="font-medium">Old Password</label>
+        <div className="bg-[#C7C7C7] rounded-xl py-4 px-5 flex gap-2 items-center">
+          <LockOutlined />
+          <input
+            type={showOldPassword ? 'text' : 'password'}
+            placeholder="Password"
+            className="outline-none text-sm font-medium w-full bg-[#C7C7C7] text-black placeholder-black"
+            name="oldPassword"
+            ref={oldPasswordInputElement}
+          />
+          <div onClick={handleToggleOldPassword} className="hover:cursor-pointer">
+            {showOldPassword ? <Visibility /> : <VisibilityOff />}
+          </div>
+        </div>
+      </div>
+
+      {/* New Password */}
+      <div className="mt-4">
+        <label htmlFor="newPassword" className="font-medium">New Password</label>
+        <div className="bg-[#C7C7C7] rounded-xl py-4 px-5 flex gap-2 items-center">
+          <LockOutlined />
+          <input
+            type={showNewPassword ? 'text' : 'password'}
+            placeholder="New Password"
+            className="outline-none text-sm font-medium w-full bg-[#C7C7C7] text-black placeholder-black"
+            name="newPassword"
+            ref={newPasswordInputElement}
+          />
+          <div onClick={handleToggleNewPassword} className="hover:cursor-pointer">
+            {showNewPassword ? <Visibility /> : <VisibilityOff />}
+          </div>
+        </div>
+      </div>
+
+      {/* Save Button */}
+      <div className="mt-6 flex justify-end">
+        <button>
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+</Dialog>
+
+
       </div>
       {userDetails.data.user.businesses.length > 0 ?
       <div className="bottom mx-32 pt-10">

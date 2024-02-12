@@ -219,10 +219,10 @@ function Search() {
        
                {data.data.pagination ? 
                   <div>
-                    {data.data.pagination.prev && (
+                    {data.data.pagination.previous && (
                       <button
                         onClick={() =>
-                          setCurrentPage(data.data.pagination.prev?.page)
+                          setCurrentPage(data.data.pagination.previous?.page)
                         }
                       >
                         previous

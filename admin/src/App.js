@@ -13,6 +13,8 @@ import User from "./pages/user/User";
 import NewUser from "./pages/newUser/NewUser";
 import BusinessList from "./pages/businessList/BusinessList";
 import Business from "./pages/business/Business";
+import ReviewList from "./pages/reviewList/ReviewList";
+import Review from "./pages/review/Review";
 
 
 
@@ -40,6 +42,8 @@ function App() {
           <Route path="/newUser" element={<NewUser />}></Route>
           <Route path="/businesses" element={<BusinessList />}></Route>
           <Route path="/business/:businessId" element={<Business />}></Route>
+          <Route path="/business/:businessId/reviews" element={<ReviewList />}></Route>
+          <Route path="/review/:reviewId" element={<Review />}></Route>
       
         </Routes>
         </div>

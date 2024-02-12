@@ -37,7 +37,7 @@ const ReviewSchema = new mongoose.Schema({
 
 
 // Define a post middleware to update the average rating when a review is added, updated, or deleted
-ReviewSchema.post(['save', 'findOneAndUpdate', 'remove'], async function (doc) {
+ReviewSchema.post(['save', 'findByIdAndUpdate', 'findByIdAndRemove'], async function (doc) {
     const business = await Business.findById(doc.business);
     if (!business) {
       return;

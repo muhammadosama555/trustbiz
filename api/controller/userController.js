@@ -1,4 +1,6 @@
 const User = require("../model/User.js");
+const Review = require('../model/Review.js');
+const Business = require('../model/Business'); 
 const asyncHandler=require('../middlewares/asyncHandler')
 const ErrorResponse= require("../utils/errorResponse")
 const sharp = require("sharp");
@@ -51,20 +53,42 @@ exports.updateUser = async (req, res) => {
   
   };
 
-//Delete User  => /api/auth/delete/id
-exports.deleteUser = asyncHandler(async (req,res,next)=>{
-    const user = await User.findByIdAndDelete(req.params.id)
 
-    if (!user) {
-        return next(new ErrorResponse(`User not found with id of ${req.params.id}`, 404));
-      }
-    
-    res.status(200).json({
-      success:true,
-      message: 'user has been succesfully deleted'
+// Delete User and their associated businesses and reviews
+// Route: DELETE /api/auth/delete/:id
+// Access: Private
 
-    })
-})
+exports.deleteUser = asyncHandler(async (req, res, next) => {
+  const userId = req.params.id;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+      return next(new ErrorResponse(`User not found with id of ${userId}`, 404));
+  }
+
+  // Find all businesses owned by the user
+  const businesses = await Business.find({ owner: userId });
+
+  for (const business of businesses) {
+    // Delete all reviews associated with the business
+    const deleteResult = await Review.deleteMany({ business: business._id });
+    console.log(`Deleted ${deleteResult.deletedCount} reviews for business ${business._id}`);
+}
+
+  // Delete all businesses associated with the user
+  await Business.deleteMany({ owner: userId });
+
+  // Now delete the user using findByIdAndRemove
+  await User.findByIdAndRemove(userId);
+
+  res.status(200).json({
+      success: true,
+      message: 'User, their businesses, and associated reviews have been successfully deleted'
+  });
+});
+
+  
 
 //update user image
 

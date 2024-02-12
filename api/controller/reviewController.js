@@ -129,12 +129,12 @@ exports.deleteReview = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('No review found with the provided ID', 404));
     }
 
-   
+    // Remove the review
+    await Review.findByIdAndRemove(req.params.id);
 
-    review = await review.remove();
+    // Remove the review reference from the associated business
+    await Business.findByIdAndUpdate(review.business, { $pull: { reviews: req.params.id } });
 
-    // Calculate average rating after removing the review
-    await Business.calculateAverageRating(req.params.businessId);
 
     res.status(200).json({
         success: true,

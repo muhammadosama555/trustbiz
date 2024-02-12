@@ -28,6 +28,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
     
         // Find the user by decoded ID
         req.user = await User.findById(decoded.id);
+        console.log(req.user)
     
         if (!req.user) {
           return next(new ErrorResponse("No user found with this ID", 404));

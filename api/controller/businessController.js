@@ -5,6 +5,7 @@ const ErrorResponse= require("../utils/errorResponse")
 const jwt = require('jsonwebtoken');
 const sharp = require("sharp");
 const cloudinary = require("../config/cloudinary");
+const Review = require('../model/Review.js');
 
 
 // Create a New Business
@@ -79,7 +80,7 @@ exports.getAllBusinesses = asyncHandler(async (req, res, next) => {
   
     // Parse page and limit parameters
     const parsedPage = parseInt(page, 10) || 1;
-    const parsedLimit = parseInt(limit, 10) || 4;
+    const parsedLimit = parseInt(limit, 10) || 10;
     const skip = (parsedPage - 1) * parsedLimit;
   
     let query = Business.find();
@@ -235,18 +236,27 @@ exports.updateBusinessImages = asyncHandler(async (req, res, next) => {
 });
 
 
-// Delete Business
+// Delete Business along with its reviews
+// Route: DELETE /api/v1/business/:id
+// Access: Private
+
 exports.deleteBusiness = asyncHandler(async (req, res, next) => {
-  const business = await Business.findById(req.params.id);
+  const businessId = req.params.id;
+
+  const business = await Business.findById(businessId);
 
   if (!business) {
-    return next(new ErrorHandler('Business not found', 404));
+      return next(new ErrorResponse('Business not found', 404));
   }
 
-  await business.remove();
+  // Delete all reviews associated with the business
+  await Review.deleteMany({ business: businessId });
+
+  // Now delete the business using findByIdAndRemove
+  await Business.findByIdAndRemove(businessId);
 
   res.status(200).json({
-    success: true,
-    message: 'Business deleted',
+      success: true,
+      message: 'Business and its reviews successfully deleted'
   });
 });

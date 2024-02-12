@@ -2,8 +2,8 @@ import React from 'react'
 import { QueryClientProvider, QueryClient } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import { ToastContainer } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { ScrollToTop } from "./hooks/ScrollToTop";
 import "./App.css";
 //import List from './pages/List.jsx';
@@ -17,6 +17,9 @@ import BusinessDetails from './pages/BusinessDetails';
  import SignUp from './pages/SignUp';
 import List from './pages/List';
 import EditBusiness from './pages/EditBusiness';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import ForgetPassword from './pages/ForgetPassword.jsx';
 
 const queryClient = new QueryClient()
 
@@ -38,9 +41,10 @@ const App = () => {
    <Route path='/profile' element={<Profile/>}/>
    <Route path='/signup' element={<SignUp/>}/>
    <Route path='/signin' element={<SignIn/>}/>
+   <Route path="/forgetPassword" element={<ForgetPassword />} />
    </Routes>
    <Footer/>
-   {/* <ToastContainer
+   <ToastContainer
           autoClose={3000}
           draggable={false}
           position="top-right"
@@ -49,7 +53,7 @@ const App = () => {
           closeOnClick
           rtl={false}
           pauseOnHover
-        /> */}
+        />
       </BrowserRouter>
      <ReactQueryDevtools intialIsOpen={false} position="bottom-right" />
     </QueryClientProvider>

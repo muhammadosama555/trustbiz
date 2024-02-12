@@ -4,25 +4,77 @@ import { useQueryClient } from 'react-query'
 import { API_BASE_URL } from "../config";
 import { store } from "../redux/store";
 
+// get businesses
 
-// post review
+const getReviews = async () => {
 
-export const postReview = async (reviewData) => {
-    console.log(reviewData)
-    const currentUser = store.getState().userSlice.currentUser;
-    const token = currentUser ? currentUser.token : null;
-    return axios.post(`${API_BASE_URL}/reviews`, reviewData,{
-      headers:{
-        'authorization':"Bearer "+ token
-      }
-    });
-  }
-  
-  export const usePostReview = () => {
-    const queryClient = useQueryClient()
-  return useMutation(postReview,{
-    onSuccess: (data) => {
-        queryClient.invalidateQueries('business');
+ return await axios.get(`${API_BASE_URL}/reviews`)
+}
+
+export const useGetReviews = () => {
+ return useQuery('reviews', () => getReviews())
+}
+
+// get review details
+
+const getReviewDetails = async (reviewId) => {
+  const currentUser = store.getState().userSlice.currentUser;
+  const token = currentUser ? currentUser.token : null;
+  return axios.get(`${API_BASE_URL}/reviews/${reviewId}`, {
+    headers: {
+      authorization: "Bearer " + token,
     },
-  })
-  }
+  });
+};
+
+export const useGetReviewDetails = (reviewId) => {
+  return useQuery(["review",reviewId], () => {
+      return getReviewDetails(reviewId);
+  });
+};
+
+// delete review
+
+export const deleteReview = async (reviewId) => {
+  console.log(reviewId)
+  const currentUser = store.getState().userSlice.currentUser;
+  const token = currentUser ? currentUser.token : null;
+  return axios.delete(`${API_BASE_URL}/reviews/${reviewId}`,{
+    headers:{
+      'authorization':"Bearer "+ token
+    }
+  });
+}
+
+export const useDeleteReview = () => {
+  const queryClient = useQueryClient()
+return useMutation(deleteReview,{
+  onSuccess: (data) => {
+    queryClient.invalidateQueries('business');
+  
+  },
+})
+}
+
+
+// update review
+
+export const updateReview = async (reviewData) => {
+  
+  const currentUser = store.getState().userSlice.currentUser;
+  const token = currentUser ? currentUser.token : null;
+  return axios.put(`${API_BASE_URL}/reviews/${reviewData.reviewId}`, reviewData, {
+    headers: {
+      authorization: "Bearer " + token,
+    },
+  });
+};
+
+export const useUpdateReview = () => {
+  const queryClient = useQueryClient();
+  return useMutation(updateReview, {
+    onSuccess: (data) => {
+      queryClient.invalidateQueries("review")
+    },
+  });
+};

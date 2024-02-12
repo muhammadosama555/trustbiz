@@ -6,6 +6,29 @@ import { usePostReview } from "../apiCalls/reviewApiCalls";
 import StarRating from "../components/StarRating";
 import { useSelector } from "react-redux";
 import moment from 'moment';
+import Slider from "react-slick";
+
+function SampleNextArrow(props) {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{ ...style, display: "block", background: "#e79703", borderRadius: "50%" }}
+      onClick={onClick}
+    />
+  );
+}
+
+function SamplePrevArrow(props) {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{ ...style, display: "block", background: "#e79703", borderRadius: "50%"}}
+      onClick={onClick}
+    />
+  );
+}
 
 
 function BusinessDetails() {
@@ -81,6 +104,17 @@ const prevImage = () => {
   setCurrentImageIndex((prevIndex) => (prevIndex - 1 + businessDetails.data.business.img.length) % businessDetails.data.business.img.length);
 };
 
+const settings = {
+  dots: true,
+  infinite: true,
+  speed: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  autoplay: true,
+  nextArrow: <SampleNextArrow />,
+  prevArrow: <SamplePrevArrow />,
+};
+
 const fallbackImage = '/assets/avatar.jpg';
 
   return (
@@ -116,10 +150,10 @@ const fallbackImage = '/assets/avatar.jpg';
 
 
      {/* Carousel and Description Layout */}
-     <div className="flex mx-24 my-14">
+     <div className="flex mx-24 my-14 gap-16">
             {/* Carousel (60% width) */}
-            <div className="w-2/3  relative">
-              {/* Previous Button */}
+            {/* <div className="w-2/3  relative">
+       
               <button
                 className="absolute top-1/2 left-52  bg-gray-800 p-2  rounded-full text-white"
                 onClick={prevImage}
@@ -127,21 +161,35 @@ const fallbackImage = '/assets/avatar.jpg';
                 &lt;
               </button>
 
-              {/* Image */}
+       
               <img
                 src={businessDetails.data.business.img[currentImageIndex].url}
                 alt="Business Image"
                 className="mx-auto max-w-full h-96 rounded-lg"
               />
 
-              {/* Next Button */}
+         
               <button
                 className="absolute top-1/2 right-52  bg-gray-800 p-2 rounded-full text-white"
                 onClick={nextImage}
               >
                 &gt;
               </button>
-            </div>
+            </div> */}
+
+            <div className="w-2/4  relative ">
+                <Slider {...settings}>
+                  {businessDetails.data.business.img.map((image, index) => (
+                  
+                  <img
+                  src={image.url}
+                  alt={index}
+                  className="mx-auto max-w-full h-96 rounded-lg"
+                />
+                   
+                  ))}
+                </Slider>
+              </div>
 
             {/* Description (40% width) */}
             <div className="w-1/3 justify-center my-auto">
@@ -223,7 +271,7 @@ const fallbackImage = '/assets/avatar.jpg';
                 </div>
               </form>
             </div>
-          ) : businessDetails?.data.business.owner !== userId  ? (
+          ) : businessDetails?.data.business.owner !== userId && userId  ? (
             <div className="w-full text-center py-5">
               <button onClick={() => setReviewFormVisible(true)} className="text-base text-center nav-link font-normal bg-slate-200 px-5 py-2 rounded-lg hover:drop-shadow-sm">
                 Write a Review

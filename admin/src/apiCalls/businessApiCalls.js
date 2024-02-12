@@ -6,19 +6,19 @@ import { store } from "../redux/store";
 
 // get businesses
 
-const getBusinesses = async (currentPage=1,limit=4,search="",categories=[],sortBy="",maxRating=5) => {
+const getBusinesses = async (currentPage=1,search="",categories=[],sortBy="",maxRating=5) => {
     // Convert the categories array to a formatted string
     const formattedCategories = categories.join(',');
-   let url = `${API_BASE_URL}/businesses?page=${currentPage}&limit=${limit}&search=${search}&sortBy=${sortBy}&maxRating=${maxRating}`;
+   let url = `${API_BASE_URL}/businesses?page=${currentPage}&search=${search}&sortBy=${sortBy}&maxRating=${maxRating}`;
    if (categories.length > 0) {
-       url = `${API_BASE_URL}/businesses?page=${currentPage}&limit=${limit}&search=${search}&categories=${formattedCategories}&sortBy=${sortBy}&maxRating=${maxRating}`;
+       url = `${API_BASE_URL}/businesses?page=${currentPage}&search=${search}&categories=${formattedCategories}&sortBy=${sortBy}&maxRating=${maxRating}`;
    }
     console.log(url); // Log the URL before making the request
    return await axios.get(url)
  }
  
- export const useGetBusinesses = (currentPage,limit,search,categories,sortBy,maxRating) => {
-   return useQuery(['businesses',currentPage,limit,search,categories,sortBy,maxRating], () => getBusinesses(currentPage,limit,search,categories,sortBy,maxRating))
+ export const useGetBusinesses = (currentPage,search,categories,sortBy,maxRating) => {
+   return useQuery(['businesses',currentPage,search,categories,sortBy,maxRating], () => getBusinesses(currentPage,search,categories,sortBy,maxRating))
  }
 
 // get business details
